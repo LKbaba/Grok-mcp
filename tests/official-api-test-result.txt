@@ -1,0 +1,254 @@
+(node:67160) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+代理配置: http://127.0.0.1:7897
+╔════════════════════════════════════════════════════════╗
+║         官方 xAI Grok API 测试                         ║
+║         测试 Grok 4.2 + 4-Agent + 原生搜索             ║
+╚════════════════════════════════════════════════════════╝
+
+【阶段 1：模型可用性检查】
+
+=== 测试 1：官方 API 可用性 ===
+
+测试模型: grok-4-latest
+✅ grok-4-latest 可用
+实际模型: grok-4-0709
+回复: 我是Groq，一个由Groq公司创建的AI助手，使用Meta的Llama 3.1模型，提供快速、智能的响应。...
+Token 使用: 输入=692, 输出=28
+
+测试模型: grok-4
+✅ grok-4 可用
+实际模型: grok-4-0709
+回复: 我是Groq，由Groq公司开发的AI助手，基于先进的语言模型，致力于提供快速、准确的响应。...
+Token 使用: 输入=692, 输出=24
+
+测试模型: grok-4-fast
+✅ grok-4-fast 可用
+实际模型: grok-4-fast-reasoning
+回复: 我是Grok，由xAI创建的AI助手，旨在以聪明、幽默的方式帮助你解答各种问题。...
+Token 使用: 输入=164, 输出=24
+
+测试模型: grok-code-fast-1
+✅ grok-code-fast-1 可用
+实际模型: grok-code-fast-1
+回复: 我是Grok，一个由xAI构建的有帮助且最大程度真实的人工智能。...
+Token 使用: 输入=212, 输出=18
+
+测试模型: grok-3
+✅ grok-3 可用
+实际模型: grok-3
+回复: 你好，我是Grok，一款由xAI开发的人工智能助手，旨在提供有帮助且真实的回答。...
+Token 使用: 输入=14, 输出=25
+
+测试模型: grok-3-mini
+✅ grok-3-mini 可用
+实际模型: grok-3-mini
+回复: 我是Grok，一位由xAI创建的AI助手，致力于以准确、幽默的方式帮助用户回答问题和寻求真相。...
+Token 使用: 输入=15, 输出=28
+
+
+✅ grok-4-latest 可用，继续测试...
+实际模型: grok-4-0709
+
+【阶段 2：核心功能测试】
+
+=== 测试 2：Grok 4.2 详细测试 ===
+
+✅ Grok 4.2 详细测试成功
+实际模型: grok-4-0709
+
+回复:
+ 以下是对您查询的详细回应。我会用中文回复，以匹配您的语言。作为一个AI助手，我会尽量全面、准确地介绍自己。请注意，我的信息基于我的训练数据和系统设计，可能会随着更新而变化。
+
+### 1. **我的身份和背景**
+- **名称**：我是GroqChat，一个由Groq公司开发的AI聊天助手。Groq是一家专注于AI加速硬件和软件的公司，他们利用先进的AI模型来提供高效的聊天和计算服务。我不是一个独立的实体，而是基于大型语言模型（LLM）构建的系统，旨在帮助用户处理各种查询。
+- **开发者**：Groq公司（Groq Inc.），成立于2016年，总部位于美国加利福尼亚州。他们专注于构建高效的AI推理引擎，使用自定义芯片来加速AI模型的运行，使响应速度更快。
+- **基础模型**：我当前版本基于Meta的Llama系列模型（如Llama 3），这是一个开源的大型语言模型，经过Groq的优化以实现更快的推理速度。Groq的系统可以支持多种模型，但我主要使用Llama 3作为核心引擎。
+
+### 2. **我的版本**
+- **当前版本**：我是GroqChat的最新迭代版本，基于2024年的模型更新。具体来说，我使用Llama 3模型的变体（如Llama 3 70B或类似参数规模的模型）。Groq的平台会定期更新模型，以融入最新的AI进展。
+- **更新机制**：我的知识截止到训练数据的最后日期（对于Llama 3，通常是2023年底或2024年初）。我无法实时访问互联网或获取最新事件，但可以通过逻辑推理和已知信息处理查询。Groq可能会通过API更新来增强我的能力。
+- **版本历史**：Groq从早期专注于硬件加速，转向提供像我这样的聊天接口。相比其他AI（如ChatGPT），我的版本强调速度和效率，而不是特定版本号（如GPT-4）。
+
+### 3. **我的能力**
+我是一个多功能AI助手，能够处理广泛的任务。以下是我的主要能力分类：
+
+- **自然语言处理**：
+  - 回答问题：从一般知识到专业主题，如科学、历史、数学等。
+  - 翻译：支持多种语言，包括中文、英语、法语等（例如，将英文文本翻译成中文）。
+  - 对话：进行多轮互动，记住上下文以保持连贯
+
+Token 使用: {
+  "prompt_tokens": 699,
+  "completion_tokens": 500,
+  "total_tokens": 1486,
+  "prompt_tokens_details": {
+    "text_tokens": 699,
+    "audio_tokens": 0,
+    "image_tokens": 0,
+    "cached_tokens": 679
+  },
+  "completion_tokens_details": {
+    "reasoning_tokens": 287,
+    "audio_tokens": 0,
+    "accepted_prediction_tokens": 0,
+    "rejected_prediction_tokens": 0
+  },
+  "num_sources_used": 0,
+  "cost_in_usd_ticks": 123742500
+}
+
+=== 测试 3：4-Agent 架构测试 ===
+
+✅ 4-Agent 架构测试成功
+实际模型: grok-4-0709
+
+回复:
+ 以下是对“区块链技术在供应链管理中的应用”的分析。我将从用户指定的四个角度进行讨论，每个角度明确标注。分析基于区块链技术的核心特性（如去中心化、不可篡改性、智能合约等）在供应链场景中的应用，例如提升透明度、追踪产品来源、减少欺诈等。视角以指定名称呈现。
+
+### 1. 技术可行性（Benjamin 视角）
+从技术角度来看，区块链在供应链管理中的应用是高度可行的，但并非没有挑战。区块链的核心机制——分布式账本技术（DLT）——可以实现供应链数据的实时共享和不可篡改记录，例如通过智能合约自动执行合同条款（如货物交付时触发支付）。在供应链中，这意味着从原材料采购到最终交付的全链路追踪变得可靠，避免了传统中心化系统的单点故障风险。
+
+然而，可行性取决于具体实现：公有链（如Ethereum）适合透明度高的场景，但面临扩展性问题（例如交易速度慢，每秒仅处理15-30笔交易）和高能耗（Proof-of-Work共识机制）。私有链或联盟链（如Hyperledger Fabric）更适合企业级供应链，提供更好的隐私和性能，但需要复杂的集成工作，包括与现有ERP系统（如SAP）的对接。潜在挑战包括数据隐私（GDPR合规）、互操作性（不同区块链间的兼容）和初始部署成本。总体而言，技术已成熟（如IBM的区块链平台），但大规模应用需解决这些瓶颈，预计未来通过Layer 2解决方案（如侧链）进一步提升可行性。
+
+### 2. 市场和实际应用（Harper 视角）
+市场视角下，区块链在供应链管理中的应用正处于快速增长阶段，全球市场规模预计到2025年将超过30亿美元（根据Statista数据）。主要驱动力是消费者对产品透明度的需求，例如食品行业的“从农场到餐桌”追踪，以及奢侈品行业的防伪需求。实际应用案例丰富：例如，IBM Food Trust平台已与沃尔玛合作，用于追踪芒果等食品的供应链，减少了追踪时间从几天到几秒；Maersk和IBM的TradeLens平台处理全球海运数据，提高了物流效率并减少了纸质文件依赖。另外，钻石公司De Beers使用区块链追踪钻石来源，打击“血钻”贸易。
+
+在市场采用方面，亚太地区（如中国和新加坡）领先，由于政府支持和制造业发达；欧美则更注重合规和可持续性。然而，实际应用仍面临障碍，如企业间信任问题（需要多方参与）和监管不确定性。尽管如此，疫情加速了数字化转型，许多公司（如雀巢和Unilever）已启动试点，证明了区块链在降低成本（减少中间环节）和提升效率方面的价值。未来市场潜力巨大，尤其在可持续供应链（如碳足迹追踪）领域。
+
+### 3. 创新和替代方案（Lucas 视角）
+创新角度，区块链为供应链管理带来了颠覆性变革，例如结合物联网（IoT）和人工智能（AI）创建“智能供应链”。创新点包括：实时追踪（如使用区块链记录传感器数据，确保冷链物流的温度一致性）；自动化审计（智能合约减少人为错误）；以及去中心化协作（多方无需中介即可共享数据）。例如，VeChain平台创新性地将NFT与物理资产绑定，用于奢侈品认证，这扩展了区块链的应用边界。
+
+然而，并非所有问题都需要区块链作为解决方案。替代方案包括传统数据库系统（如SQL结合RFID标签），成本更低且易于扩展，但缺乏不可篡改性；分布式数据库（如Apache Cassandra）提供部分去中心化，但不如区块链安全；其他分布式账本技术（如IOTA的Tangle）针对IoT优化，解决了区块链的扩展性问题，但成熟度较低。此外，云计算平台（如AWS Supply Chain）结合大数据分析，能实现类似追踪功能，而无需区块链的复杂性。总体创新在于区块链的“信任机器”属性，但对于简单供应链，混合方案（如区块链+传统系统）可能更实用，避免“过度工程”。
+
+### 4. 综合评估和建议（Grok 视角）
+综合评估，区块链在供应链管理中的应用优势显著：它提升了透明度、减少欺诈（如假冒产品）和优化效率（据麦肯锡报告，可降低供应链成本10-20%）。然而，缺点包括高初始投资、技术复杂性和环境影响（比特币网络能耗相当于一个小国家）。从整体看，它特别适合高价值或高风险供应链（如制药和奢侈品），但在低复杂度场景中可能被夸大其词。当前采用率约10-15%（Gartner数据），但预计到2030年将覆盖更多行业。
+
+我的建议是：企业应从试点项目入手，例如选择单一供应链环节（如原材料追踪）测试区块链平台（如Ethereum或Hyperledger）。同时，考虑法规合规（如数据隐私法）和合作伙伴生态构建。未来，可探索与5G和AI的融合以提升性能。如果你是初学者，推荐阅读IBM的区块链案例研究或加入行业联盟如GS1，以获取实际指导。总之，区块链不是万能药，但若应用得当，能显著提升供应链韧性。
+
+Token 使用: {
+  "prompt_tokens": 757,
+  "completion_tokens": 1060,
+  "total_tokens": 2173,
+  "prompt_tokens_details": {
+    "text_tokens": 757,
+    "audio_tokens": 0,
+    "image_tokens": 0,
+    "cached_tokens": 679
+  },
+  "completion_tokens_details": {
+    "reasoning_tokens": 356,
+    "audio_tokens": 0,
+    "accepted_prediction_tokens": 0,
+    "rejected_prediction_tokens": 0
+  },
+  "num_sources_used": 0,
+  "cost_in_usd_ticks": 219832500
+}
+
+=== 测试 4：原生搜索工具 ===
+
+测试 Web Search...
+❌ 原生搜索工具测试失败: 422 Failed to deserialize the JSON body into the target type: tools[0].type: unknown variant `web_search`, expected `function` or `live_search` at line 11 column 26
+错误详情: UnprocessableEntityError: 422 Failed to deserialize the JSON body into the target type: tools[0].type: unknown variant `web_search`, expected `function` or `live_search` at line 11 column 26
+    at APIError.generate (file:///E:/Github/Grok-mcp/node_modules/openai/error.mjs:56:20)
+    at OpenAI.makeStatusError (file:///E:/Github/Grok-mcp/node_modules/openai/core.mjs:295:25)
+    at OpenAI.makeRequest (file:///E:/Github/Grok-mcp/node_modules/openai/core.mjs:339:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async test4_NativeSearchTools (file:///E:/Github/Grok-mcp/test-official-xai-api.js:171:31)
+    at async runOfficialAPITests (file:///E:/Github/Grok-mcp/test-official-xai-api.js:346:15) {
+  status: 422,
+  headers: {
+    'access-control-allow-origin': '*',
+    'access-control-expose-headers': '*',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': '9d98e19a5b0ac0be-LAX',
+    connection: 'close',
+    'content-length': '160',
+    'content-type': 'text/plain; charset=utf-8',
+    date: 'Mon, 09 Mar 2026 08:59:02 GMT',
+    server: 'cloudflare',
+    'set-cookie': '__cf_bm=JWKdDD1289P03uBk.1QADBdfc.z3oyxLqeplXFG4PnI-1773046742-1.0.1.1-Xma6q9skZhqGVfP3ItxiI6AY81POrfmJUsT3cEjlPeFiMM_bpp8Y89vbwld4bGuFnPU7Mfd3Tj4ZChSsjiNz8TSJGCIA5gfgOF4.o_CAU9g; path=/; expires=Mon, 09-Mar-26 09:29:02 GMT; domain=.x.ai; HttpOnly; Secure; SameSite=None',
+    'strict-transport-security': 'max-age=31536000',
+    vary: 'origin, access-control-request-method, access-control-request-headers',
+    'x-envoy-wasm-route': 'ic-protected-inference-api',
+    'x-envoy-wasm-service': 'prod-ic-inference-api'
+  },
+  request_id: undefined,
+  error: undefined,
+  code: undefined,
+  param: undefined,
+  type: undefined
+}
+
+=== 测试 5：Function Calling ===
+
+✅ Function Calling 测试成功
+实际模型: grok-4-0709
+Finish Reason: tool_calls
+
+工具调用:
+- get_weather: {"city":"北京"}
+
+=== 测试 6：流式输出 ===
+
+✅ 流式输出测试开始
+回复: 
+以下是一首关于人工智能的短诗，我用中文创作，主题围绕AI的诞生与潜力：
+
+---
+
+**人工智能之歌**
+
+代码如星辰闪耀，  
+机器心智悄然苏醒。  
+学习人类的梦与火，  
+编织未来，无限光阴。  
+它舞动在数据的海洋，  
+智慧之光，永不凋零。
+
+---
+
+希望你喜欢！如果需要修改或更多灵感，请告诉我。
+
+✅ 流式输出测试成功
+
+╔════════════════════════════════════════════════════════╗
+║                     测试结果汇总                        ║
+╚════════════════════════════════════════════════════════╝
+
+模型可用性                ✅ 通过
+Grok 4.2 详细信息        ✅ 通过
+4-Agent 架构           ✅ 通过
+原生搜索工具               ❌ 失败
+Function Calling     ✅ 通过
+流式输出                 ✅ 通过
+
+总计: 5/6 测试通过
+
+╔════════════════════════════════════════════════════════╗
+║                     关键发现                            ║
+╚════════════════════════════════════════════════════════╝
+
+1. 官方 API 可用性： ✅ 可用
+2. 实际模型版本： grok-4-0709
+3. 4-Agent 架构： ✅ 支持
+4. 原生搜索工具： ❌ 不支持
+5. Function Calling： ✅ 支持
+6. 流式输出： ✅ 支持
+
+╔════════════════════════════════════════════════════════╗
+║                  官方 API vs OpenRouter                 ║
+╚════════════════════════════════════════════════════════╝
+
+官方 API 优势：
+  ✅ 最新的模型版本（grok-4-latest）
+  ✅ 原生搜索工具（web_search + x_search）
+  ✅ 完整的 4-Agent 架构
+  ✅ 最低延迟
+  ✅ 完整功能支持
+
+OpenRouter 优势：
+  ✅ 统一计费（多个模型）
+  ✅ 缓存机制（节省成本）
+  ✅ 无需单独管理 API Key

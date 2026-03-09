@@ -1,0 +1,16 @@
+{
+  "name": "grok-mcp-test",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Grok API 测试脚本",
+  "scripts": {
+    "test": "node test-grok-api.js"
+  },
+  "dependencies": {
+    "https-proxy-agent": "^7.0.6",
+    "openai": "^4.77.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0"
+  }
+}
