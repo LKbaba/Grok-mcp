@@ -1,0 +1,35 @@
+{
+    "claudeCodeChatUI.thinking.enabled": true,
+    "claudeCodeChatUI.thinking.intensity": "think",
+    "claudeCodeChatUI.mcp.servers": [
+        {
+            "name": "gemini-assistant",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@lkbaba/mcp-server-gemini@latest"
+            ],
+            "env": {
+                "GEMINI_API_KEY": "xxxxxxx"
+            }
+        },
+        {
+            "name": "playwright",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@executeautomation/playwright-mcp-server"
+            ],
+            "env": {}
+        },
+        {
+            "name": "context7",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@upstash/context7-mcp@latest"
+            ],
+            "env": {}
+        }
+    ]
+}
