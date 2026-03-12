@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-03-12
+
+### Security
+
+- **Path traversal protection**: `context_files` paths are now sandboxed to the working directory; attempts to read `../../etc/passwd` etc. are blocked
+- **Sensitive file blocking**: `.env`, `.pem`, `.key`, credentials, and database files are automatically excluded from `context_files`
+- **context_files limit**: Maximum 10 files enforced (both JSON Schema and runtime)
+- **Domain validation hardening**: Added max length (253 chars) to domain strings to prevent ReDoS
+
 ## [1.0.0] - 2026-03-12
 
 ### Added

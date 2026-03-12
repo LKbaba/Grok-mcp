@@ -90,7 +90,7 @@ export const mcpConfig = {
   /** Service name */
   name: 'grok-mcp',
   /** Service version */
-  version: '1.0.0',
+  version: '1.0.1',
 } as const;
 
 /**

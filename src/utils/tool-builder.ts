@@ -16,14 +16,14 @@ import type { XAIWebSearchTool, XAIXSearchTool } from '../types/index.js';
  */
 const webSearchOptionsSchema = z.object({
   allowedDomains: z
-    .array(z.string().min(1, 'Domain cannot be empty').regex(
+    .array(z.string().min(1, 'Domain cannot be empty').max(253, 'Domain too long').regex(
       /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/,
       'Invalid domain format, e.g.: github.com, stackoverflow.com'
     ))
     .max(5, 'Maximum of 5 allowed domains')
     .optional(),
   excludedDomains: z
-    .array(z.string().min(1, 'Domain cannot be empty').regex(
+    .array(z.string().min(1, 'Domain cannot be empty').max(253, 'Domain too long').regex(
       /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/,
       'Invalid domain format, e.g.: github.com, stackoverflow.com'
     ))

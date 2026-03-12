@@ -73,7 +73,7 @@ Multi-perspective idea generation with project context support.
 |-----------|------|----------|---------|-------------|
 | `topic` | string | Yes | - | Brainstorming topic |
 | `context` | string | No | - | Additional context |
-| `context_files` | string[] | No | - | Project files to read as context |
+| `context_files` | string[] | No | - | Project files to read as context (max 10) |
 | `count` | number | No | `5` | Number of ideas (1-10) |
 | `style` | enum | No | `balanced` | `innovative` / `practical` / `radical` / `balanced` |
 | `model` | enum | No | `grok-4.20-beta` | Model selection |
@@ -173,6 +173,13 @@ src/
 | Brainstorm | Structured JSON | **Structured JSON + style/count/context_files** |
 
 **Best strategy**: Use both! Gemini for speed and code analysis, Grok for deep search and X/Twitter intelligence.
+
+## Security
+
+- **Path traversal protection**: `context_files` are sandboxed to the working directory — paths like `../../etc/passwd` are blocked
+- **Sensitive file blocking**: `.env`, `.pem`, `.key`, credentials, and database files are automatically excluded
+- **Input validation**: Domain filters, date ranges, and file counts are validated with strict schemas
+- **No hardcoded secrets**: API keys are loaded from environment variables only
 
 ## License
 

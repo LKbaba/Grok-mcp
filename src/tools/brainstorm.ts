@@ -5,7 +5,7 @@
  */
 
 import { readFile } from 'fs/promises';
-import { resolve } from 'path';
+import { resolve, relative, isAbsolute, basename } from 'path';
 import type {
   GrokBrainstormInput,
   GrokBrainstormOutput,
@@ -28,13 +28,64 @@ const STYLE_DESCRIPTIONS: Record<string, string> = {
   balanced: 'Balanced: Balance innovation with feasibility, analyze from multiple dimensions',
 };
 
+// Sensitive file patterns that should never be read
+const SENSITIVE_PATTERNS = [
+  /\.env($|\.)/i,
+  /\.pem$/i, /\.key$/i, /\.pfx$/i,
+  /id_rsa/i, /id_ed25519/i, /id_dsa/i,
+  /credentials/i, /secrets?\./i,
+  /password/i,
+  /\.sqlite3?$/i, /\.db$/i,
+];
+
+const MAX_CONTEXT_FILES = 10;
+
+/**
+ * Validate file path is safe to read (no path traversal, no sensitive files)
+ */
+function isPathSafe(filePath: string): { safe: boolean; reason?: string } {
+  const cwd = process.cwd();
+  const absolutePath = resolve(cwd, filePath);
+
+  // Check path traversal: resolved path must stay within cwd
+  const rel = relative(cwd, absolutePath);
+  if (rel.startsWith('..') || isAbsolute(rel)) {
+    return { safe: false, reason: 'path traversal blocked' };
+  }
+
+  // Check sensitive file patterns
+  const name = basename(filePath);
+  const normalized = filePath.replace(/\\/g, '/');
+  for (const pattern of SENSITIVE_PATTERNS) {
+    if (pattern.test(name) || pattern.test(normalized)) {
+      return { safe: false, reason: 'sensitive file blocked' };
+    }
+  }
+
+  return { safe: true };
+}
+
 /**
  * Read project file contents
  */
 async function readContextFiles(files: string[]): Promise<string> {
   const contents: string[] = [];
 
-  for (const filePath of files) {
+  // Enforce file count limit
+  const limitedFiles = files.slice(0, MAX_CONTEXT_FILES);
+  if (files.length > MAX_CONTEXT_FILES) {
+    console.error(`[Brainstorm] Too many context files (${files.length}), limited to ${MAX_CONTEXT_FILES}`);
+  }
+
+  for (const filePath of limitedFiles) {
+    // Validate path safety
+    const check = isPathSafe(filePath);
+    if (!check.safe) {
+      console.error(`[Brainstorm] Skipped "${filePath}": ${check.reason}`);
+      contents.push(`--- File: ${filePath} ---\n(${check.reason})`);
+      continue;
+    }
+
     try {
       const absolutePath = resolve(filePath);
       const content = await readFile(absolutePath, 'utf-8');

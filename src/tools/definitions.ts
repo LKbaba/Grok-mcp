@@ -151,8 +151,9 @@ export const grokBrainstormTool = {
       context_files: {
         type: 'array',
         items: { type: 'string' },
+        maxItems: 10,
         description:
-          'Project file paths (optional), reads file content as context\n' +
+          'Project file paths (optional, max 10), reads file content as context\n' +
           'e.g.: ["./README.md", "./docs/architecture.md"]',
       },
       count: {
