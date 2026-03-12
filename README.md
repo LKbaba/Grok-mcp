@@ -34,7 +34,7 @@ Add to your MCP config file:
   "mcpServers": {
     "grok-mcp": {
       "command": "npx",
-      "args": ["-y", "@lkbaba/grok-mcp"],
+      "args": ["-y", "@lkbaba/grok-mcp@latest"],
       "env": {
         "XAI_API_KEY": "your_xai_api_key_here"
       }
@@ -42,6 +42,8 @@ Add to your MCP config file:
   }
 }
 ```
+
+> `@latest` ensures you always get the newest version when Claude Code restarts.
 
 ### 3. Restart Claude Code
 
@@ -119,7 +121,7 @@ Add proxy environment variable to your config:
   "mcpServers": {
     "grok-mcp": {
       "command": "npx",
-      "args": ["-y", "@lkbaba/grok-mcp"],
+      "args": ["-y", "@lkbaba/grok-mcp@latest"],
       "env": {
         "XAI_API_KEY": "your_xai_api_key_here",
         "HTTPS_PROXY": "http://127.0.0.1:7897"
