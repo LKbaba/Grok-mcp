@@ -1,11 +1,11 @@
 {
   "name": "@lkbaba/grok-mcp",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "MCP server for xAI Grok with real-time Web + X (Twitter) search and creative brainstorming",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "grok-mcp": "./dist/index.js"
+    "grok-mcp": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
