@@ -1,0 +1,67 @@
+{
+  "name": "@lkbaba/grok-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for xAI Grok with real-time Web + X (Twitter) search and creative brainstorming",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "grok-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "test:integration": "vitest tests/integration"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "grok",
+    "xai",
+    "search",
+    "x-search",
+    "twitter-search",
+    "brainstorm",
+    "ai",
+    "llm",
+    "claude-code",
+    "claude-desktop",
+    "typescript"
+  ],
+  "author": "LKbaba",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LKbaba/Grok-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LKbaba/Grok-mcp/issues"
+  },
+  "homepage": "https://github.com/LKbaba/Grok-mcp#readme",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.22.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0"
+  }
+}
