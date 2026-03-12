@@ -39,9 +39,10 @@ export const grokAgentSearchTool = {
         enum: [...SUPPORTED_MODELS],
         description:
           'Grok model to use:\n' +
-          '- grok-4.20-beta: Fast, affordable, 2M context (default)\n' +
-          '- grok-4-latest: Highest quality, for complex tasks',
-        default: 'grok-4.20-beta',
+          '- grok-4.20-multi-agent-beta-0309: 4-Agent collaboration, lowest hallucination rate (default)\n' +
+          '- grok-4.20-beta-0309-reasoning: Deep chain-of-thought reasoning\n' +
+          '- grok-4.20-beta-0309-non-reasoning: Fastest speed, creative divergence',
+        default: 'grok-4.20-multi-agent-beta-0309',
       },
       output_format: {
         type: 'string',
@@ -49,34 +50,30 @@ export const grokAgentSearchTool = {
         description:
           'Output format:\n' +
           '- text: Markdown format (default)\n' +
-          '- json: Structured JSON format',
+          '- json: Structured JSON (enforced via native JSON Schema)',
         default: 'text',
       },
       web_search_config: {
         type: 'object',
-        description: 'Web search config (when search_type is web or mixed)',
+        description: 'Web search config (when search_type is web or mixed). Image understanding is enabled by default.',
         properties: {
-          enable_image_understanding: {
-            type: 'boolean',
-            description: 'Enable image understanding, allows Grok to analyze images in search results',
-          },
           allowed_domains: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Only search specified domains (max 5), e.g.: ["wikipedia.org", "github.com"]',
+            description: 'Only search specified domains (max 5, mutually exclusive with excluded_domains), e.g.: ["wikipedia.org", "github.com"]',
             maxItems: 5,
           },
           excluded_domains: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Exclude specified domains (max 5), e.g.: ["example.com"]',
+            description: 'Exclude specified domains (max 5, mutually exclusive with allowed_domains), e.g.: ["example.com"]',
             maxItems: 5,
           },
         },
       },
       x_search_config: {
         type: 'object',
-        description: 'X search config (when search_type is x or mixed)',
+        description: 'X search config (when search_type is x or mixed). Image understanding is enabled by default.',
         properties: {
           from_date: {
             type: 'string',
@@ -90,10 +87,6 @@ export const grokAgentSearchTool = {
               'End date, ISO8601 format, e.g.: 2024-12-31T23:59:59Z\n' +
               'Used to limit the search time range end',
           },
-          enable_image_understanding: {
-            type: 'boolean',
-            description: 'Enable image understanding, allows Grok to analyze images in tweets',
-          },
           enable_video_understanding: {
             type: 'boolean',
             description: 'Enable video understanding, allows Grok to analyze video content in tweets',
@@ -102,7 +95,7 @@ export const grokAgentSearchTool = {
             type: 'array',
             items: { type: 'string' },
             description:
-              'Only search tweets from specified X accounts (max 10), e.g.: ["elonmusk", "OpenAI"]\n' +
+              'Only search tweets from specified X accounts (max 10, mutually exclusive with excluded_x_handles), e.g.: ["elonmusk", "OpenAI"]\n' +
               'Note: No @ prefix needed',
             maxItems: 10,
           },
@@ -110,7 +103,7 @@ export const grokAgentSearchTool = {
             type: 'array',
             items: { type: 'string' },
             description:
-              'Exclude tweets from specified X accounts (max 10), e.g.: ["spam_account"]\n' +
+              'Exclude tweets from specified X accounts (max 10, mutually exclusive with allowed_x_handles), e.g.: ["spam_account"]\n' +
               'Note: No @ prefix needed',
             maxItems: 10,
           },
@@ -179,9 +172,10 @@ export const grokBrainstormTool = {
         enum: [...SUPPORTED_MODELS],
         description:
           'Grok model to use:\n' +
-          '- grok-4.20-beta: Fast, affordable, 2M context (default)\n' +
-          '- grok-4-latest: Highest quality, for complex tasks',
-        default: 'grok-4.20-beta',
+          '- grok-4.20-multi-agent-beta-0309: 4-Agent collaboration, lowest hallucination rate (default)\n' +
+          '- grok-4.20-beta-0309-reasoning: Deep chain-of-thought reasoning\n' +
+          '- grok-4.20-beta-0309-non-reasoning: Fastest speed, creative divergence',
+        default: 'grok-4.20-multi-agent-beta-0309',
       },
       output_format: {
         type: 'string',
@@ -189,7 +183,7 @@ export const grokBrainstormTool = {
         description:
           'Output format:\n' +
           '- text: Markdown format (default)\n' +
-          '- json: Structured JSON (ideas array with title/description/pros/cons/feasibility)',
+          '- json: Structured JSON enforced via native JSON Schema (ideas array with title/description/pros/cons/feasibility/implementation)',
         default: 'text',
       },
     },

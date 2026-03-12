@@ -62,11 +62,16 @@ const env = validateEnv();
 // ============================================================================
 
 /**
- * Supported model list
- * grok-4.20-beta: Default model, fast, affordable, 2M context, 4-Agent native architecture
- * grok-4-latest: Flagship model, highest quality, suitable for complex tasks
+ * Supported model list (Grok 4.20 series only)
+ * multi-agent-beta-0309: 4-Agent collaboration (Grok+Harper+Benjamin+Lucas), lowest hallucination rate (~4.2%)
+ * beta-0309-reasoning: Single-model chain-of-thought, best for deep linear reasoning
+ * beta-0309-non-reasoning: Fastest speed, best for quick creative divergence
  */
-export const SUPPORTED_MODELS = ['grok-4.20-beta', 'grok-4-latest'] as const;
+export const SUPPORTED_MODELS = [
+  'grok-4.20-multi-agent-beta-0309',
+  'grok-4.20-beta-0309-reasoning',
+  'grok-4.20-beta-0309-non-reasoning',
+] as const;
 export type SupportedModel = typeof SUPPORTED_MODELS[number];
 
 /**
@@ -77,8 +82,8 @@ export const xaiConfig = {
   apiKey: env.XAI_API_KEY,
   /** API base URL */
   baseURL: 'https://api.x.ai/v1',
-  /** Default model (v3: switched from grok-4-latest to grok-4.20-beta) */
-  defaultModel: 'grok-4.20-beta' as SupportedModel,
+  /** Default model (v4: multi-agent for best search accuracy and brainstorm quality) */
+  defaultModel: 'grok-4.20-multi-agent-beta-0309' as SupportedModel,
   /** Request timeout (milliseconds) */
   timeout: 120000, // 120 seconds
 } as const;
@@ -90,7 +95,7 @@ export const mcpConfig = {
   /** Service name */
   name: 'grok-mcp',
   /** Service version */
-  version: '1.0.1',
+  version: '2.0.0',
 } as const;
 
 /**

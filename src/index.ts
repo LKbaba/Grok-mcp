@@ -77,7 +77,23 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         // Format output
         let output = `# Search Results\n\n${result.content}\n\n`;
 
-        if (result.citations.length > 0) {
+        // Search queries (what Grok actually searched)
+        if (result.searchQueries.length > 0) {
+          output += `## Search Queries\n\n`;
+          result.searchQueries.forEach((q) => {
+            output += `- ${q}\n`;
+          });
+          output += `\n`;
+        }
+
+        // Sources with titles (from annotations), fallback to raw citation URLs
+        if (result.sources.length > 0) {
+          output += `## Sources\n\n`;
+          result.sources.forEach((source, index) => {
+            output += `${index + 1}. [${source.title}](${source.url})\n`;
+          });
+          output += `\n`;
+        } else if (result.citations.length > 0) {
           output += `## Citations\n\n`;
           result.citations.forEach((url, index) => {
             output += `${index + 1}. ${url}\n`;
@@ -86,7 +102,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
 
         output += `## Usage Statistics\n\n`;
-        output += `- Model: ${input.model || 'grok-4.20-beta'}\n`;
+        output += `- Model: ${input.model || 'grok-4.20-multi-agent-beta-0309'}\n`;
         output += `- Input Tokens: ${result.usage.input_tokens}\n`;
         output += `- Output Tokens: ${result.usage.output_tokens}\n`;
         output += `- Reasoning Tokens: ${result.usage.reasoning_tokens}\n`;
@@ -133,7 +149,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         output += `---\n\n${result.content}\n\n`;
 
         output += `---\n\n## Usage Statistics\n\n`;
-        output += `- Model: ${input.model || 'grok-4.20-beta'}\n`;
+        output += `- Model: ${input.model || 'grok-4.20-multi-agent-beta-0309'}\n`;
         output += `- Input Tokens: ${result.usage.input_tokens}\n`;
         output += `- Output Tokens: ${result.usage.output_tokens}\n`;
         output += `- Reasoning Tokens: ${result.usage.reasoning_tokens}\n`;

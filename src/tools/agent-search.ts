@@ -14,6 +14,8 @@ import {
   extractCitations,
   extractUsage,
   calculateCost,
+  extractSearchQueries,
+  extractSources,
 } from '../utils/grok-client.js';
 import {
   buildWebSearchTool,
@@ -95,26 +97,65 @@ export async function grokAgentSearch(
       throw new Error('At least one search type must be specified (web, x, or mixed)');
     }
 
-    // 2. Build query content (if JSON output needed, request it in the prompt)
-    let queryContent = input.query;
-    if (outputFormat === 'json') {
-      queryContent += '\n\nPlease return search results in JSON format with the following structure:\n' +
-        '{"summary": "Search summary", "results": [{"title": "Title", "content": "Content", "source": "Source URL"}], "key_findings": ["Finding 1", "Finding 2"]}';
-    }
+    // 2. Build messages with system prompt for citation guidance
+    const messages: Array<{ role: 'system' | 'user'; content: string }> = [
+      {
+        role: 'system',
+        content:
+          'You are a research assistant with access to web and X (Twitter) search. ' +
+          'When answering: 1. Cite sources with inline links ' +
+          '2. Clearly distinguish facts from analysis ' +
+          '3. Synthesize information from multiple sources when relevant',
+      },
+      { role: 'user', content: input.query },
+    ];
 
-    // 3. Call Grok API
+    // 3. Build JSON Schema for structured output (if requested)
+    const textFormat = outputFormat === 'json' ? {
+      type: 'json_schema' as const,
+      name: 'search_result',
+      schema: {
+        type: 'object',
+        properties: {
+          summary: { type: 'string' },
+          results: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                title: { type: 'string' },
+                content: { type: 'string' },
+                source: { type: 'string' },
+              },
+              required: ['title', 'content', 'source'],
+              additionalProperties: false,
+            },
+          },
+          key_findings: { type: 'array', items: { type: 'string' } },
+        },
+        required: ['summary', 'results', 'key_findings'],
+        additionalProperties: false,
+      },
+      strict: true,
+    } : undefined;
+
+    // 4. Call Grok API
     if (debugMode) {
       console.error('[Agent Search] Calling Grok API...');
     }
 
     const response = await createResponse({
       model,
-      messages: [{ role: 'user', content: queryContent }],
+      messages,
       server_side_tools: tools,
+      temperature: 0.6, // Fixed: search needs factual accuracy
+      ...(textFormat ? { text: { format: textFormat } } : {}),
     });
 
-    // 4. Extract results
+    // 5. Extract results
     const content = extractContent(response);
+    const searchQueries = extractSearchQueries(response);
+    const sources = extractSources(response);
     const citations = extractCitations(content);
     const usage = extractUsage(response);
     const cost = calculateCost(response);
@@ -122,14 +163,18 @@ export async function grokAgentSearch(
     if (debugMode) {
       console.error('[Agent Search] Search completed');
       console.error('[Agent Search] Model:', model);
-      console.error('[Agent Search] Citations:', citations.length);
+      console.error('[Agent Search] Search queries:', searchQueries);
+      console.error('[Agent Search] Sources:', sources.length);
+      console.error('[Agent Search] Citations (fallback):', citations.length);
       console.error('[Agent Search] Token usage:', usage.total_tokens);
       console.error('[Agent Search] Cost:', `$${cost.toFixed(6)}`);
     }
 
-    // 5. Return result
+    // 6. Return result
     return {
       content,
+      searchQueries,
+      sources,
       citations,
       usage,
     };

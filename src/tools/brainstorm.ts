@@ -146,9 +146,8 @@ Please brainstorm on the following topic:
   prompt += `\nPlease generate **${count}** creative ideas`;
 
   if (outputFormat === 'json') {
-    // JSON format output requirements
-    prompt += `, and strictly return in the following JSON format (do not include markdown code block markers):
-{"ideas": [{"title": "Idea title", "description": "Detailed description", "pros": ["Pro 1", "Pro 2"], "cons": ["Challenge 1"], "feasibility": "high or medium or low", "implementation": "Implementation suggestions"}]}`;
+    // JSON output enforced by native text.format JSON Schema — no prompt hint needed
+    prompt += `.`;
   } else {
     // Markdown format output requirements
     prompt += `. Each idea should include:
@@ -214,25 +213,59 @@ export async function grokBrainstorm(
       console.error('[Brainstorm] Calling Grok API...');
     }
 
-    // Adjust temperature based on style
-    let temperature: number | undefined;
+    // Adjust temperature based on style (v4 updated values)
+    let temperature: number;
     switch (input.style) {
       case 'radical':
-        temperature = 1.2; // Higher randomness, encourage bold ideas
+        temperature = 1.0; // Capped at Grok's stable output limit
         break;
       case 'innovative':
-        temperature = 0.9; // Moderate creativity
+        temperature = 0.95; // Widened gap from balanced
         break;
       case 'practical':
-        temperature = 0.5; // More conservative, focus on feasibility
+        temperature = 0.5; // Conservative, focus on feasibility
         break;
-      // balanced and default: no temperature set, use model default
+      default: // balanced
+        temperature = 0.7; // Explicit default (was model default)
+        break;
     }
+
+    // Build JSON Schema for structured output (if requested)
+    const outputFormat = input.output_format || 'text';
+    const textFormat = outputFormat === 'json' ? {
+      type: 'json_schema' as const,
+      name: 'brainstorm_result',
+      schema: {
+        type: 'object',
+        properties: {
+          ideas: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                title: { type: 'string' },
+                description: { type: 'string' },
+                pros: { type: 'array', items: { type: 'string' } },
+                cons: { type: 'array', items: { type: 'string' } },
+                feasibility: { type: 'string', enum: ['high', 'medium', 'low'] },
+                implementation: { type: 'string' },
+              },
+              required: ['title', 'description', 'pros', 'cons', 'feasibility', 'implementation'],
+              additionalProperties: false,
+            },
+          },
+        },
+        required: ['ideas'],
+        additionalProperties: false,
+      },
+      strict: true,
+    } : undefined;
 
     const response = await createResponse({
       model,
       messages: [{ role: 'user', content: prompt }],
       temperature,
+      ...(textFormat ? { text: { format: textFormat } } : {}),
       // No search tools — purely relying on Grok's creative thinking
     });
 

@@ -11,7 +11,7 @@ An MCP server that connects Claude Code to xAI's Grok, unlocking real-time web s
 | **Web + X Search** | Real-time information with transparent source URLs |
 | **X/Twitter Search** | Track social media trends, public opinion, breaking news |
 | **4-Agent Architecture** | Harper (research) + Benjamin (logic) + Lucas (creative) collaboration |
-| **2M Token Context** | Massive context window with grok-4.20-beta |
+| **2M Token Context** | Massive context window for comprehensive analysis |
 
 > **Philosophy**: Claude is the commander, Grok is the specialist for real-time search and social media intelligence.
 
@@ -49,16 +49,18 @@ Add to your MCP config file:
 
 ### grok_agent_search - Smart Search
 
-Real-time web and X (Twitter) search powered by Grok.
+Real-time web and X (Twitter) search powered by Grok. Grok automatically analyzes queries, executes searches (potentially multiple rounds), synthesizes information, and provides cited answers.
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `query` | string | Yes | - | Search query |
 | `search_type` | enum | No | `mixed` | `web` / `x` / `mixed` (recommended) |
-| `model` | enum | No | `grok-4.20-beta` | `grok-4.20-beta` (fast) / `grok-4-latest` (best quality) |
-| `output_format` | enum | No | `text` | `text` (Markdown) / `json` (structured) |
-| `web_search_config` | object | No | - | Domain filters, image understanding |
-| `x_search_config` | object | No | - | Date range, handle filters, video understanding |
+| `model` | enum | No | `grok-4.20-multi-agent-beta-0309` | See model table below |
+| `output_format` | enum | No | `text` | `text` (Markdown) / `json` (native JSON Schema enforced) |
+| `web_search_config` | object | No | - | Domain filters (allowed/excluded are mutually exclusive) |
+| `x_search_config` | object | No | - | Date range, handle filters (allowed/excluded are mutually exclusive), video understanding |
+
+**Output includes**: Search results with inline citations, search queries Grok used, titled source links, and usage statistics.
 
 **Example:**
 ```
@@ -76,8 +78,10 @@ Multi-perspective idea generation with project context support.
 | `context_files` | string[] | No | - | Project files to read as context (max 10) |
 | `count` | number | No | `5` | Number of ideas (1-10) |
 | `style` | enum | No | `balanced` | `innovative` / `practical` / `radical` / `balanced` |
-| `model` | enum | No | `grok-4.20-beta` | Model selection |
-| `output_format` | enum | No | `text` | `text` (Markdown) / `json` (structured with pros/cons/feasibility) |
+| `model` | enum | No | `grok-4.20-multi-agent-beta-0309` | Model selection |
+| `output_format` | enum | No | `text` | `text` (Markdown) / `json` (native JSON Schema with pros/cons/feasibility) |
+
+**Style temperature mapping**: practical=0.5, balanced=0.7, innovative=0.95, radical=1.0
 
 **Example:**
 ```
@@ -86,10 +90,11 @@ Multi-perspective idea generation with project context support.
 
 ## Model Selection
 
-| Model | Price (input/output) | Context | Speed | Best For |
-|-------|---------------------|---------|-------|----------|
-| `grok-4.20-beta` | $0.20 / $0.50 per M | 2M | Fast | Default, 4-Agent native, lowest hallucination |
-| `grok-4-latest` | $2.50 / $10.00 per M | 256K | Slow | Complex tasks requiring highest quality |
+| Model | Architecture | Price (input/output per M) | Context | Best For |
+|-------|-------------|---------------------------|---------|----------|
+| `grok-4.20-multi-agent-beta-0309` | 4-Agent collaboration | $2.00 / $6.00 | 2M | **Default** — lowest hallucination rate (~4.2%) |
+| `grok-4.20-beta-0309-reasoning` | Chain-of-thought | $2.00 / $6.00 | 2M | Deep technical analysis |
+| `grok-4.20-beta-0309-non-reasoning` | Standard | $2.00 / $6.00 | 2M | Fastest speed, quick creative divergence |
 
 ## Performance
 
@@ -97,9 +102,10 @@ Tested on 2026-03-12:
 
 | Operation | Model | Time | Tokens |
 |-----------|-------|------|--------|
-| Web Search | grok-4.20-beta | ~29s | ~70K |
-| X Search | grok-4.20-beta | ~28s | ~48K |
-| Brainstorm (3 ideas) | grok-4.20-beta | ~16s | ~3.6K |
+| Web Search | multi-agent | ~29s | ~70K |
+| X Search | multi-agent | ~28s | ~48K |
+| Brainstorm (3 ideas) | multi-agent | ~16s | ~3.6K |
+| Brainstorm (5 ideas) | non-reasoning | ~7s | ~2.2K |
 
 ## Proxy Configuration
 
@@ -166,10 +172,10 @@ src/
 |---------|-----------|----------|
 | Web Search | Google Search (grounding) | Grok Web Search |
 | X/Twitter Search | Not available | **Native support** |
-| Citation URLs | Google redirect (opaque) | **Direct URLs (transparent)** |
+| Citation URLs | Google redirect (opaque) | **Direct URLs with titles (transparent)** |
 | Search Speed | ~8-10s (flash) | ~16-29s (grok-4.20) |
-| Codebase Analysis | 1M token context | Not available |
-| Multimodal | Image analysis | Not available |
+| Agent Architecture | Single model | **4-Agent collaboration** |
+| Structured Output | text/json | **text/json (native JSON Schema enforced)** |
 | Brainstorm | Structured JSON | **Structured JSON + style/count/context_files** |
 
 **Best strategy**: Use both! Gemini for speed and code analysis, Grok for deep search and X/Twitter intelligence.
@@ -178,7 +184,8 @@ src/
 
 - **Path traversal protection**: `context_files` are sandboxed to the working directory — paths like `../../etc/passwd` are blocked
 - **Sensitive file blocking**: `.env`, `.pem`, `.key`, credentials, and database files are automatically excluded
-- **Input validation**: Domain filters, date ranges, and file counts are validated with strict schemas
+- **Input validation**: Domain filters, date ranges, handle filters, and file counts are validated with strict schemas
+- **Mutual exclusivity**: `allowed_domains`/`excluded_domains` and `allowed_x_handles`/`excluded_x_handles` cannot be set simultaneously
 - **No hardcoded secrets**: API keys are loaded from environment variables only
 
 ## License

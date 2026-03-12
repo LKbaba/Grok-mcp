@@ -103,15 +103,17 @@ export function buildWebSearchTool(options?: {
     }
   }
 
+  // Mutual exclusivity check (xAI API requirement)
+  if (options?.allowedDomains?.length && options?.excludedDomains?.length) {
+    throw new Error('allowed_domains and excluded_domains are mutually exclusive');
+  }
+
   // Build tool object
   const tool: XAIWebSearchTool = {
     type: 'web_search',
+    // Default: enable image understanding (v4 decision)
+    enable_image_understanding: options?.enableImageUnderstanding ?? true,
   };
-
-  // Add optional parameters
-  if (options?.enableImageUnderstanding !== undefined) {
-    tool.enable_image_understanding = options.enableImageUnderstanding;
-  }
 
   // Add filters
   if (options?.allowedDomains || options?.excludedDomains) {
@@ -176,17 +178,21 @@ export function buildXSearchTool(options?: {
     }
   }
 
+  // Mutual exclusivity check (xAI API requirement)
+  if (options?.allowedXHandles?.length && options?.excludedXHandles?.length) {
+    throw new Error('allowed_x_handles and excluded_x_handles are mutually exclusive');
+  }
+
   // Build tool object
   const tool: XAIXSearchTool = {
     type: 'x_search',
+    // Default: enable image understanding (v4 decision)
+    enable_image_understanding: options?.enableImageUnderstanding ?? true,
   };
 
   // Add optional parameters
   if (options?.fromDate) tool.from_date = options.fromDate;
   if (options?.toDate) tool.to_date = options.toDate;
-  if (options?.enableImageUnderstanding !== undefined) {
-    tool.enable_image_understanding = options.enableImageUnderstanding;
-  }
   if (options?.enableVideoUnderstanding !== undefined) {
     tool.enable_video_understanding = options.enableVideoUnderstanding;
   }

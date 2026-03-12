@@ -42,6 +42,11 @@ export async function createResponse(
     body.tools = request.server_side_tools;
   }
 
+  // Native JSON Schema structured output
+  if (request.text) {
+    body.text = request.text;
+  }
+
   if (debugMode) {
     console.error('[Grok Client] Sending request:', JSON.stringify(body, null, 2));
   }
@@ -179,4 +184,111 @@ export function calculateCost(response: XAIResponsesResponse): number {
   // 1 tick = 0.0000000001 USD
   // i.e. 10,000,000,000 ticks = 1 USD
   return costInTicks / 10_000_000_000;
+}
+
+/**
+ * Extract search queries from response output array
+ *
+ * Grok's output contains web_search_call/x_search_call entries
+ * that record the actual search keywords Grok used.
+ *
+ * @param response - API response
+ * @returns Array of search query strings
+ */
+export function extractSearchQueries(response: XAIResponsesResponse): string[] {
+  const queries: string[] = [];
+
+  for (const item of response.output) {
+    if (
+      (item.type === 'web_search_call' || item.type === 'x_search_call') &&
+      item.action?.query
+    ) {
+      queries.push(item.action.query);
+    }
+  }
+
+  return queries;
+}
+
+/**
+ * Generate a readable title from a URL when no real title is available.
+ * e.g. "https://www.anthropic.com/news/claude-opus-4-6" → "Claude Opus 4 6 — anthropic.com"
+ * e.g. "https://x.com/xai/status/123456" → "@xai — x.com"
+ */
+function titleFromUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    const domain = parsed.hostname.replace(/^www\./, '');
+    const segments = parsed.pathname.split('/').filter(Boolean);
+
+    // Special handling for X/Twitter URLs: extract @handle
+    if (domain === 'x.com' || domain === 'twitter.com') {
+      const handle = segments[0];
+      if (handle && handle !== 'i') {
+        return `@${handle} — ${domain}`;
+      }
+      return domain;
+    }
+
+    // General: take the last meaningful path segment
+    const last = segments[segments.length - 1];
+
+    if (last) {
+      // Convert slug to readable text: "claude-code-best-practices" → "Claude Code Best Practices"
+      const readable = decodeURIComponent(last)
+        .replace(/[-_]/g, ' ')
+        .replace(/\.\w+$/, '') // strip file extension
+        .replace(/\b\w/g, c => c.toUpperCase());
+      return `${readable} — ${domain}`;
+    }
+
+    return domain;
+  } catch {
+    return url;
+  }
+}
+
+/**
+ * Check if a title from annotations is actually useful (not just a citation index)
+ */
+function isUsefulTitle(title: string | undefined): boolean {
+  if (!title) return false;
+  // Reject pure numbers ("1", "2"), very short strings, or bracketed numbers ("[1]")
+  if (/^\[?\d+\]?$/.test(title.trim())) return false;
+  if (title.trim().length < 3) return false;
+  return true;
+}
+
+/**
+ * Extract sources with titles from annotations
+ *
+ * xAI annotations contain url and title for each citation,
+ * providing richer source info than regex-extracted URLs.
+ * When title is missing or just a citation index, generates a readable title from URL.
+ *
+ * @param response - API response
+ * @returns Deduplicated array of { title, url } objects
+ */
+export function extractSources(response: XAIResponsesResponse): Array<{ title: string; url: string }> {
+  const seen = new Set<string>();
+  const sources: Array<{ title: string; url: string }> = [];
+
+  const messageOutput = response.output?.find(item => item.type === 'message');
+  if (!messageOutput?.content) return sources;
+
+  for (const contentItem of messageOutput.content) {
+    if (contentItem.type === 'output_text' && contentItem.annotations) {
+      for (const annotation of contentItem.annotations) {
+        if (annotation.url && !seen.has(annotation.url)) {
+          seen.add(annotation.url);
+          sources.push({
+            title: isUsefulTitle(annotation.title) ? annotation.title! : titleFromUrl(annotation.url),
+            url: annotation.url,
+          });
+        }
+      }
+    }
+  }
+
+  return sources;
 }

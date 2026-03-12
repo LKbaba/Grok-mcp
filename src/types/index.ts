@@ -25,6 +25,15 @@ export interface XAIResponsesRequest {
   temperature?: number;
   /** Server-side tool configuration */
   server_side_tools?: Array<XAIWebSearchTool | XAIXSearchTool>;
+  /** Structured output format (native JSON Schema enforcement) */
+  text?: {
+    format: {
+      type: 'json_schema';
+      name: string;
+      schema: Record<string, unknown>;
+      strict: boolean;
+    };
+  };
 }
 
 /**
@@ -163,7 +172,11 @@ export interface GrokAgentSearchInput {
 export interface GrokAgentSearchOutput {
   /** Search result content */
   content: string;
-  /** Cited URL list */
+  /** Grok's actual search queries (extracted from web_search_call/x_search_call output entries) */
+  searchQueries: string[];
+  /** Sources with titles (extracted from annotations) */
+  sources: Array<{ title: string; url: string }>;
+  /** Cited URL list (fallback: regex-extracted from text when annotations unavailable) */
   citations: string[];
   /** Token usage statistics */
   usage: {
