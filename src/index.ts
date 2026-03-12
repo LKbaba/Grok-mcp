@@ -186,6 +186,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
  */
 async function main() {
   try {
+    // Setup proxy for Node.js fetch (required for users behind proxy/VPN)
+    const proxyUrl = process.env.HTTPS_PROXY || process.env.HTTP_PROXY || process.env.https_proxy || process.env.http_proxy;
+    if (proxyUrl) {
+      try {
+        // @ts-ignore -- undici is bundled with Node.js, no need for explicit dependency
+        const undici = await import('undici');
+        undici.setGlobalDispatcher(new undici.ProxyAgent(proxyUrl));
+        logger.info(`Proxy configured: ${proxyUrl}`);
+      } catch {
+        logger.error('Failed to configure proxy. Install undici if needed: npm install undici');
+      }
+    }
+
     logger.info('Starting Grok-MCP server...');
     logger.info(`Service name: ${mcpConfig.name}`);
     logger.info(`Service version: ${mcpConfig.version}`);

@@ -2,7 +2,7 @@
  * Grok API Client
  *
  * Uses native fetch to call xAI Responses API
- * Native fetch (undici) automatically reads HTTPS_PROXY env var, no extra proxy config needed
+ * Proxy support is configured globally in index.ts via undici ProxyAgent
  */
 
 import type {
