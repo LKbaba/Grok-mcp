@@ -1,79 +1,79 @@
 /**
- * Grok-MCP TypeScript 类型定义
+ * Grok-MCP TypeScript Type Definitions
  *
- * 本文件定义了 xAI API、MCP 工具和项目配置的所有类型
+ * Defines all types for xAI API, MCP tools, and project configuration
  */
 
 // ============================================================================
-// xAI API 类型定义
+// xAI API Type Definitions
 // ============================================================================
 
 /**
- * xAI Responses API 请求类型
+ * xAI Responses API request type
  */
 export interface XAIResponsesRequest {
-  /** 模型名称，例如 "grok-2-1212" */
+  /** Model name, e.g. "grok-4.20-beta" */
   model: string;
-  /** 对话消息数组 */
+  /** Conversation messages array */
   messages: Array<{
     role: 'system' | 'user' | 'assistant';
     content: string;
   }>;
-  /** 流式响应开关 */
+  /** Streaming response toggle */
   stream: boolean;
-  /** 温度参数 (0-2)，控制随机性 */
+  /** Temperature (0-2), controls randomness */
   temperature?: number;
-  /** 服务端工具配置 */
+  /** Server-side tool configuration */
   server_side_tools?: Array<XAIWebSearchTool | XAIXSearchTool>;
 }
 
 /**
- * Web Search 工具配置
+ * Web Search tool configuration
  */
 export interface XAIWebSearchTool {
   type: 'web_search';
-  /** 启用图片理解 */
+  /** Enable image understanding */
   enable_image_understanding?: boolean;
-  /** 过滤器配置 */
+  /** Filter configuration */
   filters?: {
-    /** 仅搜索指定域名（最多 5 个） */
+    /** Only search specified domains (max 5) */
     allowed_domains?: string[];
-    /** 排除指定域名（最多 5 个） */
+    /** Exclude specified domains (max 5) */
     excluded_domains?: string[];
   };
 }
 
 /**
- * X Search 工具配置
+ * X Search tool configuration
  */
 export interface XAIXSearchTool {
   type: 'x_search';
-  /** 开始日期 (ISO8601 格式) */
+  /** Start date (ISO8601 format) */
   from_date?: string;
-  /** 结束日期 (ISO8601 格式) */
+  /** End date (ISO8601 format) */
   to_date?: string;
-  /** 启用图片理解 */
+  /** Enable image understanding */
   enable_image_understanding?: boolean;
-  /** 启用视频理解 */
+  /** Enable video understanding */
   enable_video_understanding?: boolean;
-  /** 仅搜索指定用户（最多 10 个） */
+  /** Only search specified users (max 10) */
   allowed_x_handles?: string[];
-  /** 排除指定用户（最多 10 个） */
+  /** Exclude specified users (max 10) */
   excluded_x_handles?: string[];
 }
 
 /**
- * xAI Responses API 响应类型
+ * xAI Responses API response type
  */
 export interface XAIResponsesResponse {
-  /** 输出数组，可能包含搜索调用记录和消息 */
+  /** Output array, may contain search call records and messages */
   output: Array<{
     type: string;
     role?: 'assistant';
     content?: Array<{
       type: 'output_text';
       text: string;
-      /** 文本注释（包含引用信息） */
+      /** Text annotations (contains citation info) */
       annotations?: Array<{
         type: string;
         url?: string;
@@ -82,38 +82,38 @@ export interface XAIResponsesResponse {
         end_index: number;
       }>;
     }>;
-    /** 搜索调用的动作信息 */
+    /** Search call action info */
     action?: {
       type: string;
       query?: string;
     };
     status?: string;
   }>;
-  /** Token 使用统计 */
+  /** Token usage statistics */
   usage: XAIUsage;
 }
 
 /**
- * Token 使用统计类型
+ * Token usage statistics type
  */
 export interface XAIUsage {
-  /** 输入 tokens */
+  /** Input tokens */
   input_tokens: number;
-  /** 输入 tokens 详情 */
+  /** Input tokens details */
   input_tokens_details?: {
     cached_tokens?: number;
   };
-  /** 输出 tokens */
+  /** Output tokens */
   output_tokens: number;
-  /** 输出 tokens 详情 */
+  /** Output tokens details */
   output_tokens_details?: {
     reasoning_tokens?: number;
   };
-  /** 总 tokens */
+  /** Total tokens */
   total_tokens: number;
-  /** 成本（单位：ticks，1 tick = 0.0000000001 USD） */
+  /** Cost (unit: ticks, 1 tick = 0.0000000001 USD) */
   cost_in_usd_ticks: number;
-  /** 服务端工具使用详情（不使用搜索工具时可能不存在） */
+  /** Server-side tool usage details (may be absent when no search tools used) */
   server_side_tool_usage_details?: {
     web_search_calls?: number;
     x_search_calls?: number;
@@ -125,28 +125,28 @@ export interface XAIUsage {
 }
 
 // ============================================================================
-// MCP 工具类型定义
+// MCP Tool Type Definitions
 // ============================================================================
 
 /**
- * grok_agent_search 工具输入参数
+ * grok_agent_search tool input parameters
  */
 export interface GrokAgentSearchInput {
-  /** 搜索查询 */
+  /** Search query */
   query: string;
-  /** 搜索类型 */
+  /** Search type */
   search_type?: 'web' | 'x' | 'mixed';
-  /** 使用的模型（v3 新增） */
+  /** Model to use */
   model?: string;
-  /** 输出格式（v3 新增） */
+  /** Output format */
   output_format?: 'text' | 'json';
-  /** Web Search 配置（当 search_type 为 'web' 或 'mixed' 时） */
+  /** Web Search config (when search_type is 'web' or 'mixed') */
   web_search_config?: {
     enable_image_understanding?: boolean;
     allowed_domains?: string[];
     excluded_domains?: string[];
   };
-  /** X Search 配置（当 search_type 为 'x' 或 'mixed' 时） */
+  /** X Search config (when search_type is 'x' or 'mixed') */
   x_search_config?: {
     from_date?: string;
     to_date?: string;
@@ -158,14 +158,14 @@ export interface GrokAgentSearchInput {
 }
 
 /**
- * grok_agent_search 工具输出结果
+ * grok_agent_search tool output result
  */
 export interface GrokAgentSearchOutput {
-  /** 搜索结果内容 */
+  /** Search result content */
   content: string;
-  /** 引用的 URL 列表 */
+  /** Cited URL list */
   citations: string[];
-  /** Token 使用统计 */
+  /** Token usage statistics */
   usage: {
     input_tokens: number;
     output_tokens: number;
@@ -178,32 +178,32 @@ export interface GrokAgentSearchOutput {
 }
 
 /**
- * grok_brainstorm 工具输入参数
+ * grok_brainstorm tool input parameters
  */
 export interface GrokBrainstormInput {
-  /** 头脑风暴主题 */
+  /** Brainstorm topic */
   topic: string;
-  /** 上下文信息（可选） */
+  /** Context information (optional) */
   context?: string;
-  /** 项目文件路径，读取后作为上下文（v3 新增） */
+  /** Project file paths, read as context */
   context_files?: string[];
-  /** 生成创意数量，1-10（v3 新增） */
+  /** Number of ideas to generate, 1-10 */
   count?: number;
-  /** 风格（v3 新增） */
+  /** Brainstorm style */
   style?: 'innovative' | 'practical' | 'radical' | 'balanced';
-  /** 使用的模型（v3 新增） */
+  /** Model to use */
   model?: string;
-  /** 输出格式（v3 新增） */
+  /** Output format */
   output_format?: 'text' | 'json';
 }
 
 /**
- * grok_brainstorm 工具输出结果
+ * grok_brainstorm tool output result
  */
 export interface GrokBrainstormOutput {
-  /** 创意内容 */
+  /** Generated content */
   content: string;
-  /** Token 使用统计 */
+  /** Token usage statistics */
   usage: {
     input_tokens: number;
     output_tokens: number;
@@ -213,19 +213,19 @@ export interface GrokBrainstormOutput {
 }
 
 // ============================================================================
-// 配置类型定义
+// Configuration Type Definitions
 // ============================================================================
 
 /**
- * Grok-MCP 项目配置类型
+ * Grok-MCP project configuration type
  */
 export interface GrokMCPConfig {
-  /** xAI API 密钥 */
+  /** xAI API key */
   apiKey: string;
-  /** API 基础 URL */
+  /** API base URL */
   baseURL: string;
-  /** 默认模型 */
+  /** Default model */
   model: string;
-  /** 调试模式 */
+  /** Debug mode */
   debug?: boolean;
 }

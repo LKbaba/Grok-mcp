@@ -1,77 +1,77 @@
 /**
- * 搜索工具构建器
+ * Search Tool Builder
  *
- * 提供类型安全的 xAI 搜索工具构建函数，包含参数验证
+ * Provides type-safe xAI search tool builder functions with parameter validation
  */
 
 import { z } from 'zod';
 import type { XAIWebSearchTool, XAIXSearchTool } from '../types/index.js';
 
 // ============================================================================
-// 参数验证 Schema
+// Parameter Validation Schemas
 // ============================================================================
 
 /**
- * Web Search 工具参数验证 Schema
+ * Web Search tool parameter validation schema
  */
 const webSearchOptionsSchema = z.object({
   allowedDomains: z
-    .array(z.string().min(1, '域名不能为空').regex(
+    .array(z.string().min(1, 'Domain cannot be empty').regex(
       /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/,
-      '域名格式无效，示例：github.com、stackoverflow.com'
+      'Invalid domain format, e.g.: github.com, stackoverflow.com'
     ))
-    .max(5, '最多只能指定 5 个允许的域名')
+    .max(5, 'Maximum of 5 allowed domains')
     .optional(),
   excludedDomains: z
-    .array(z.string().min(1, '域名不能为空').regex(
+    .array(z.string().min(1, 'Domain cannot be empty').regex(
       /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/,
-      '域名格式无效，示例：github.com、stackoverflow.com'
+      'Invalid domain format, e.g.: github.com, stackoverflow.com'
     ))
-    .max(5, '最多只能指定 5 个排除的域名')
+    .max(5, 'Maximum of 5 excluded domains')
     .optional(),
   enableImageUnderstanding: z.boolean().optional(),
 });
 
 /**
- * X Search 工具参数验证 Schema
+ * X Search tool parameter validation schema
  */
 const xSearchOptionsSchema = z.object({
   fromDate: z
     .string()
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/,
-      '日期必须是 ISO8601 格式（例如：2024-01-01T00:00:00Z）'
+      'Date must be in ISO8601 format (e.g.: 2024-01-01T00:00:00Z)'
     )
     .optional(),
   toDate: z
     .string()
     .regex(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/,
-      '日期必须是 ISO8601 格式（例如：2024-01-01T00:00:00Z）'
+      'Date must be in ISO8601 format (e.g.: 2024-01-01T00:00:00Z)'
     )
     .optional(),
   allowedXHandles: z
-    .array(z.string().min(1, 'X 账号不能为空'))
-    .max(10, '最多只能指定 10 个允许的 X 账号')
+    .array(z.string().min(1, 'X handle cannot be empty'))
+    .max(10, 'Maximum of 10 allowed X handles')
     .optional(),
   excludedXHandles: z
-    .array(z.string().min(1, 'X 账号不能为空'))
-    .max(10, '最多只能指定 10 个排除的 X 账号')
+    .array(z.string().min(1, 'X handle cannot be empty'))
+    .max(10, 'Maximum of 10 excluded X handles')
     .optional(),
   enableImageUnderstanding: z.boolean().optional(),
   enableVideoUnderstanding: z.boolean().optional(),
 });
 
 // ============================================================================
-// 工具构建函数
+// Tool Builder Functions
 // ============================================================================
 
 /**
- * 构建 Web Search 工具配置
+ * Build Web Search tool configuration
  *
- * @param options - Web Search 配置选项
- * @returns Web Search 工具对象
- * @throws 如果参数验证失败
+ * @param options - Web Search configuration options
+ * @returns Web Search tool object
+ * @throws If parameter validation fails
  *
  * @example
  * ```typescript
@@ -86,7 +86,7 @@ export function buildWebSearchTool(options?: {
   excludedDomains?: string[];
   enableImageUnderstanding?: boolean;
 }): XAIWebSearchTool {
-  // 参数验证
+  // Parameter validation
   if (options) {
     try {
       webSearchOptionsSchema.parse(options);
@@ -96,24 +96,24 @@ export function buildWebSearchTool(options?: {
           (err) => `  - ${err.path.join('.')}: ${err.message}`
         );
         throw new Error(
-          `Web Search 工具参数验证失败:\n${messages.join('\n')}`
+          `Web Search tool parameter validation failed:\n${messages.join('\n')}`
         );
       }
       throw error;
     }
   }
 
-  // 构建工具对象
+  // Build tool object
   const tool: XAIWebSearchTool = {
     type: 'web_search',
   };
 
-  // 添加可选参数
+  // Add optional parameters
   if (options?.enableImageUnderstanding !== undefined) {
     tool.enable_image_understanding = options.enableImageUnderstanding;
   }
 
-  // 添加过滤器
+  // Add filters
   if (options?.allowedDomains || options?.excludedDomains) {
     tool.filters = {};
     if (options.allowedDomains) {
@@ -128,11 +128,11 @@ export function buildWebSearchTool(options?: {
 }
 
 /**
- * 构建 X Search 工具配置
+ * Build X Search tool configuration
  *
- * @param options - X Search 配置选项
- * @returns X Search 工具对象
- * @throws 如果参数验证失败
+ * @param options - X Search configuration options
+ * @returns X Search tool object
+ * @throws If parameter validation fails
  *
  * @example
  * ```typescript
@@ -152,7 +152,7 @@ export function buildXSearchTool(options?: {
   enableImageUnderstanding?: boolean;
   enableVideoUnderstanding?: boolean;
 }): XAIXSearchTool {
-  // 参数验证
+  // Parameter validation
   if (options) {
     try {
       xSearchOptionsSchema.parse(options);
@@ -161,27 +161,27 @@ export function buildXSearchTool(options?: {
         const messages = error.errors.map(
           (err) => `  - ${err.path.join('.')}: ${err.message}`
         );
-        throw new Error(`X Search 工具参数验证失败:\n${messages.join('\n')}`);
+        throw new Error(`X Search tool parameter validation failed:\n${messages.join('\n')}`);
       }
       throw error;
     }
 
-    // 日期逻辑验证
+    // Date logic validation
     if (options.fromDate && options.toDate) {
       const from = new Date(options.fromDate);
       const to = new Date(options.toDate);
       if (from > to) {
-        throw new Error('fromDate 不能晚于 toDate');
+        throw new Error('fromDate cannot be later than toDate');
       }
     }
   }
 
-  // 构建工具对象
+  // Build tool object
   const tool: XAIXSearchTool = {
     type: 'x_search',
   };
 
-  // 添加可选参数
+  // Add optional parameters
   if (options?.fromDate) tool.from_date = options.fromDate;
   if (options?.toDate) tool.to_date = options.toDate;
   if (options?.enableImageUnderstanding !== undefined) {
@@ -201,14 +201,14 @@ export function buildXSearchTool(options?: {
 }
 
 // ============================================================================
-// 辅助函数
+// Helper Functions
 // ============================================================================
 
 /**
- * 验证 ISO8601 日期格式
+ * Validate ISO8601 date format
  *
- * @param dateString - 日期字符串
- * @returns 是否为有效的 ISO8601 格式
+ * @param dateString - Date string
+ * @returns Whether the string is valid ISO8601 format
  */
 export function isValidISO8601(dateString: string): boolean {
   const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/;
@@ -221,10 +221,10 @@ export function isValidISO8601(dateString: string): boolean {
 }
 
 /**
- * 将日期转换为 ISO8601 格式
+ * Convert date to ISO8601 format
  *
- * @param date - Date 对象
- * @returns ISO8601 格式的日期字符串
+ * @param date - Date object
+ * @returns ISO8601 formatted date string
  */
 export function toISO8601(date: Date): string {
   return date.toISOString();

@@ -1,7 +1,7 @@
 /**
- * grok_agent_search 工具实现
+ * grok_agent_search Tool Implementation
  *
- * 使用 Grok AI 进行智能搜索，支持 Web 搜索、X 搜索或混合搜索
+ * Intelligent search using Grok AI, supports Web search, X search, or mixed search
  */
 
 import type {
@@ -22,43 +22,43 @@ import {
 import { xaiConfig, debugMode, SUPPORTED_MODELS } from '../config/index.js';
 
 /**
- * 验证模型名称是否支持
+ * Validate model name is supported
  */
 function resolveModel(model?: string): string {
   if (!model) return xaiConfig.defaultModel;
   if ((SUPPORTED_MODELS as readonly string[]).includes(model)) return model;
-  // 不支持的模型，回退到默认并警告
-  console.error(`[Agent Search] 不支持的模型 "${model}"，使用默认模型 ${xaiConfig.defaultModel}`);
+  // Unsupported model, fall back to default with warning
+  console.error(`[Agent Search] Unsupported model "${model}", falling back to default ${xaiConfig.defaultModel}`);
   return xaiConfig.defaultModel;
 }
 
 /**
- * grok_agent_search 工具主函数
+ * grok_agent_search main function
  *
- * @param input - 搜索输入参数
- * @returns 搜索结果
+ * @param input - Search input parameters
+ * @returns Search result
  */
 export async function grokAgentSearch(
   input: GrokAgentSearchInput
 ): Promise<GrokAgentSearchOutput> {
   try {
-    // search_type 默认值为 mixed（同时搜索 Web 和 X）
+    // search_type defaults to mixed (search both Web and X)
     const searchType = input.search_type || 'mixed';
     const model = resolveModel(input.model);
     const outputFormat = input.output_format || 'text';
 
     if (debugMode) {
-      console.error('[Agent Search] 开始搜索:', input.query);
-      console.error('[Agent Search] 搜索类型:', searchType);
-      console.error('[Agent Search] 模型:', model);
-      console.error('[Agent Search] 输出格式:', outputFormat);
+      console.error('[Agent Search] Starting search:', input.query);
+      console.error('[Agent Search] Search type:', searchType);
+      console.error('[Agent Search] Model:', model);
+      console.error('[Agent Search] Output format:', outputFormat);
     }
 
-    // 1. 根据 search_type 构建工具列表
+    // 1. Build tool list based on search_type
     const tools = [];
 
     if (searchType === 'web' || searchType === 'mixed') {
-      // 构建 Web Search 工具
+      // Build Web Search tool
       const webTool = buildWebSearchTool({
         allowedDomains: input.web_search_config?.allowed_domains,
         excludedDomains: input.web_search_config?.excluded_domains,
@@ -68,12 +68,12 @@ export async function grokAgentSearch(
       tools.push(webTool);
 
       if (debugMode) {
-        console.error('[Agent Search] 添加 Web Search 工具');
+        console.error('[Agent Search] Added Web Search tool');
       }
     }
 
     if (searchType === 'x' || searchType === 'mixed') {
-      // 构建 X Search 工具
+      // Build X Search tool
       const xTool = buildXSearchTool({
         fromDate: input.x_search_config?.from_date,
         toDate: input.x_search_config?.to_date,
@@ -87,24 +87,24 @@ export async function grokAgentSearch(
       tools.push(xTool);
 
       if (debugMode) {
-        console.error('[Agent Search] 添加 X Search 工具');
+        console.error('[Agent Search] Added X Search tool');
       }
     }
 
     if (tools.length === 0) {
-      throw new Error('至少需要指定一种搜索类型（web、x 或 mixed）');
+      throw new Error('At least one search type must be specified (web, x, or mixed)');
     }
 
-    // 2. 构建查询内容（如果需要 JSON 输出，在 prompt 中要求）
+    // 2. Build query content (if JSON output needed, request it in the prompt)
     let queryContent = input.query;
     if (outputFormat === 'json') {
-      queryContent += '\n\n请以 JSON 格式返回搜索结果，包含以下结构：\n' +
-        '{"summary": "搜索摘要", "results": [{"title": "标题", "content": "内容", "source": "来源URL"}], "key_findings": ["发现1", "发现2"]}';
+      queryContent += '\n\nPlease return search results in JSON format with the following structure:\n' +
+        '{"summary": "Search summary", "results": [{"title": "Title", "content": "Content", "source": "Source URL"}], "key_findings": ["Finding 1", "Finding 2"]}';
     }
 
-    // 3. 调用 Grok API
+    // 3. Call Grok API
     if (debugMode) {
-      console.error('[Agent Search] 调用 Grok API...');
+      console.error('[Agent Search] Calling Grok API...');
     }
 
     const response = await createResponse({
@@ -113,60 +113,60 @@ export async function grokAgentSearch(
       server_side_tools: tools,
     });
 
-    // 4. 提取结果
+    // 4. Extract results
     const content = extractContent(response);
     const citations = extractCitations(content);
     const usage = extractUsage(response);
     const cost = calculateCost(response);
 
     if (debugMode) {
-      console.error('[Agent Search] 搜索完成');
-      console.error('[Agent Search] 模型:', model);
-      console.error('[Agent Search] 引用数量:', citations.length);
-      console.error('[Agent Search] Token 使用:', usage.total_tokens);
-      console.error('[Agent Search] 成本:', `$${cost.toFixed(6)}`);
+      console.error('[Agent Search] Search completed');
+      console.error('[Agent Search] Model:', model);
+      console.error('[Agent Search] Citations:', citations.length);
+      console.error('[Agent Search] Token usage:', usage.total_tokens);
+      console.error('[Agent Search] Cost:', `$${cost.toFixed(6)}`);
     }
 
-    // 5. 返回结果
+    // 5. Return result
     return {
       content,
       citations,
       usage,
     };
   } catch (error) {
-    // 错误处理
+    // Error handling
     if (error instanceof Error) {
-      console.error('[Agent Search] 搜索失败:', error.message);
+      console.error('[Agent Search] Search failed:', error.message);
 
-      // 超时错误
+      // Timeout error
       if (error.message.includes('timeout') || error.message.includes('ETIMEDOUT')) {
         throw new Error(
-          `搜索超时。建议：\n` +
-            `1. 简化查询内容\n` +
-            `2. 减少搜索范围\n` +
-            `3. 稍后重试\n` +
-            `原始错误: ${error.message}`
+          `Search timed out. Suggestions:\n` +
+            `1. Simplify the query\n` +
+            `2. Narrow the search scope\n` +
+            `3. Try again later\n` +
+            `Original error: ${error.message}`
         );
       }
 
-      // API 错误
+      // API error
       if (error.message.includes('API') || error.message.includes('401')) {
         throw new Error(
-          `API 调用失败。请检查：\n` +
-            `1. XAI_API_KEY 是否正确配置\n` +
-            `2. API 密钥是否有效\n` +
-            `3. 网络连接是否正常\n` +
-            `原始错误: ${error.message}`
+          `API call failed. Please check:\n` +
+            `1. Is XAI_API_KEY configured correctly?\n` +
+            `2. Is the API key valid?\n` +
+            `3. Is the network connection working?\n` +
+            `Original error: ${error.message}`
         );
       }
 
-      // 参数验证错误
-      if (error.message.includes('验证失败')) {
-        throw new Error(`参数验证失败: ${error.message}`);
+      // Parameter validation error
+      if (error.message.includes('validation failed')) {
+        throw new Error(`Parameter validation failed: ${error.message}`);
       }
 
-      // 其他错误
-      throw new Error(`搜索失败: ${error.message}`);
+      // Other errors
+      throw new Error(`Search failed: ${error.message}`);
     }
 
     throw error;

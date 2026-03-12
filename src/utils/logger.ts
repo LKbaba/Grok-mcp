@@ -1,13 +1,13 @@
 /**
- * 日志模块
+ * Logger Module
  *
- * 提供统一的日志记录接口，支持不同级别的日志输出
+ * Provides a unified logging interface with different log levels
  */
 
 import { debugMode } from '../config/index.js';
 
 /**
- * 日志级别
+ * Log levels
  */
 export enum LogLevel {
   DEBUG = 'DEBUG',
@@ -17,18 +17,18 @@ export enum LogLevel {
 }
 
 /**
- * 格式化时间戳
+ * Format timestamp
  */
 function getTimestamp(): string {
   return new Date().toISOString();
 }
 
 /**
- * 日志记录器
+ * Logger
  */
 export const logger = {
   /**
-   * 调试日志（仅在 DEBUG 模式下输出）
+   * Debug log (only outputs in DEBUG mode)
    */
   debug: (message: string, meta?: any) => {
     if (debugMode) {
@@ -40,7 +40,7 @@ export const logger = {
   },
 
   /**
-   * 信息日志
+   * Info log
    */
   info: (message: string, meta?: any) => {
     console.error(`[${LogLevel.INFO}] ${getTimestamp()} - ${message}`);
@@ -50,7 +50,7 @@ export const logger = {
   },
 
   /**
-   * 警告日志
+   * Warning log
    */
   warn: (message: string, meta?: any) => {
     console.error(`[${LogLevel.WARN}] ${getTimestamp()} - ${message}`);
@@ -60,7 +60,7 @@ export const logger = {
   },
 
   /**
-   * 错误日志
+   * Error log
    */
   error: (message: string, error?: Error | any) => {
     console.error(`[${LogLevel.ERROR}] ${getTimestamp()} - ${message}`);
@@ -75,7 +75,7 @@ export const logger = {
 };
 
 /**
- * 性能监控工具
+ * Performance monitor
  */
 export class PerformanceMonitor {
   private startTime: number;
@@ -84,21 +84,21 @@ export class PerformanceMonitor {
   constructor(label: string) {
     this.label = label;
     this.startTime = Date.now();
-    logger.debug(`[性能监控] ${label} 开始`);
+    logger.debug(`[Perf] ${label} started`);
   }
 
   /**
-   * 结束监控并记录耗时
+   * End monitoring and log duration
    */
   end(meta?: any): number {
     const duration = Date.now() - this.startTime;
-    logger.debug(`[性能监控] ${this.label} 完成，耗时: ${duration}ms`, meta);
+    logger.debug(`[Perf] ${this.label} completed, duration: ${duration}ms`, meta);
     return duration;
   }
 }
 
 /**
- * 创建性能监控实例
+ * Create a performance monitor instance
  */
 export function startPerformanceMonitor(label: string): PerformanceMonitor {
   return new PerformanceMonitor(label);

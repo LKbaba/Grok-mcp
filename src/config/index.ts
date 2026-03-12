@@ -1,7 +1,7 @@
 /**
- * Grok-MCP 配置管理模块
+ * Grok-MCP Configuration Module
  *
- * 负责加载环境变量、验证配置并导出类型安全的配置对象
+ * Loads environment variables, validates config, and exports type-safe configuration objects
  */
 
 import { config as dotenvConfig } from 'dotenv';
@@ -9,30 +9,30 @@ import { z } from 'zod';
 import type { GrokMCPConfig } from '../types/index.js';
 
 
-// 加载 .env 文件
+// Load .env file
 dotenvConfig();
 
 // ============================================================================
-// 配置验证 Schema
+// Config Validation Schema
 // ============================================================================
 
 /**
- * 环境变量验证 Schema
+ * Environment variable validation schema
  */
 const envSchema = z.object({
-  // xAI API 配置
-  XAI_API_KEY: z.string().min(1, 'XAI_API_KEY 环境变量不能为空'),
+  // xAI API configuration
+  XAI_API_KEY: z.string().min(1, 'XAI_API_KEY environment variable is required'),
 
-  // 调试模式（可选）
+  // Debug mode (optional)
   DEBUG: z.string().optional(),
 });
 
 // ============================================================================
-// 配置验证与加载
+// Config Validation & Loading
 // ============================================================================
 
 /**
- * 验证环境变量
+ * Validate environment variables
  */
 function validateEnv() {
   try {
@@ -43,9 +43,9 @@ function validateEnv() {
         (err) => `  - ${err.path.join('.')}: ${err.message}`
       );
       throw new Error(
-        `配置验证失败:\n${messages.join('\n')}\n\n` +
-          '请检查 .env 文件或设置相应的环境变量。\n' +
-          '参考 .env.example 文件了解所需的配置项。'
+        `Configuration validation failed:\n${messages.join('\n')}\n\n` +
+          'Please check your .env file or set the required environment variables.\n' +
+          'Refer to .env.example for required configuration items.'
       );
     }
     throw error;
@@ -53,53 +53,53 @@ function validateEnv() {
 }
 
 /**
- * 验证后的环境变量
+ * Validated environment variables
  */
 const env = validateEnv();
 
 // ============================================================================
-// 导出配置对象
+// Export Configuration Objects
 // ============================================================================
 
 /**
- * 支持的模型列表
- * grok-4.20-beta: 默认模型，快速、便宜、2M 上下文、4-Agent 原生架构
- * grok-4-latest: 旗舰模型，最高质量，适合复杂任务
+ * Supported model list
+ * grok-4.20-beta: Default model, fast, affordable, 2M context, 4-Agent native architecture
+ * grok-4-latest: Flagship model, highest quality, suitable for complex tasks
  */
 export const SUPPORTED_MODELS = ['grok-4.20-beta', 'grok-4-latest'] as const;
 export type SupportedModel = typeof SUPPORTED_MODELS[number];
 
 /**
- * xAI API 配置
+ * xAI API configuration
  */
 export const xaiConfig = {
-  /** API 密钥 */
+  /** API key */
   apiKey: env.XAI_API_KEY,
-  /** API 基础 URL */
+  /** API base URL */
   baseURL: 'https://api.x.ai/v1',
-  /** 默认模型（v3: 从 grok-4-latest 切换到 grok-4.20-beta） */
+  /** Default model (v3: switched from grok-4-latest to grok-4.20-beta) */
   defaultModel: 'grok-4.20-beta' as SupportedModel,
-  /** 请求超时时间（毫秒） */
-  timeout: 120000, // 120 秒
+  /** Request timeout (milliseconds) */
+  timeout: 120000, // 120 seconds
 } as const;
 
 /**
- * MCP 服务配置
+ * MCP service configuration
  */
 export const mcpConfig = {
-  /** 服务名称 */
+  /** Service name */
   name: 'grok-mcp',
-  /** 服务版本 */
+  /** Service version */
   version: '1.0.0',
 } as const;
 
 /**
- * 调试模式
+ * Debug mode
  */
 export const debugMode = env.DEBUG === 'true';
 
 /**
- * 完整配置对象
+ * Full configuration object
  */
 export const config: GrokMCPConfig = {
   apiKey: xaiConfig.apiKey,
@@ -109,13 +109,13 @@ export const config: GrokMCPConfig = {
 };
 
 /**
- * 打印配置信息（用于调试）
+ * Print configuration info (for debugging)
  */
 export function printConfig() {
-  console.error('Grok-MCP 配置信息:');
+  console.error('Grok-MCP Configuration:');
   console.error('  - API URL:', xaiConfig.baseURL);
-  console.error('  - 默认模型:', xaiConfig.defaultModel);
-  console.error('  - 超时时间:', xaiConfig.timeout, 'ms');
-  console.error('  - 调试模式:', debugMode ? '开启' : '关闭');
-  console.error('  - MCP 服务:', `${mcpConfig.name} v${mcpConfig.version}`);
+  console.error('  - Default Model:', xaiConfig.defaultModel);
+  console.error('  - Timeout:', xaiConfig.timeout, 'ms');
+  console.error('  - Debug Mode:', debugMode ? 'enabled' : 'disabled');
+  console.error('  - MCP Service:', `${mcpConfig.name} v${mcpConfig.version}`);
 }

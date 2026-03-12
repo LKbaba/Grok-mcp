@@ -1,117 +1,117 @@
 /**
- * MCP 工具定义
+ * MCP Tool Definitions
  *
- * 定义 Grok-MCP 提供的所有工具的 JSON Schema
+ * Defines JSON Schema for all tools provided by Grok-MCP
  */
 
 import { SUPPORTED_MODELS } from '../config/index.js';
 
 /**
- * grok_agent_search 工具定义
+ * grok_agent_search tool definition
  *
- * 使用 Grok AI 进行智能搜索，支持 Web 搜索、X 搜索或混合搜索
+ * Intelligent search using Grok AI, supports Web search, X search, or mixed search
  */
 export const grokAgentSearchTool = {
   name: 'grok_agent_search',
   description:
-    '使用 Grok AI 进行智能搜索。支持 Web 搜索、X (Twitter) 搜索或混合搜索。' +
-    'Grok 会自动分析查询、执行搜索、整合信息并提供带引用的答案。' +
-    '适用于获取最新信息、研究特定主题、追踪社交媒体动态等场景。',
+    'Intelligent search powered by Grok AI. Supports Web search, X (Twitter) search, or mixed search. ' +
+    'Grok automatically analyzes queries, executes searches, synthesizes information, and provides cited answers. ' +
+    'Ideal for getting latest information, researching topics, and tracking social media trends.',
   inputSchema: {
     type: 'object',
     properties: {
       query: {
         type: 'string',
-        description: '搜索查询内容',
+        description: 'Search query content',
       },
       search_type: {
         type: 'string',
         enum: ['web', 'x', 'mixed'],
         description:
-          '搜索类型：\n' +
-          '- web: 仅使用 Web 搜索\n' +
-          '- x: 仅使用 X (Twitter) 搜索\n' +
-          '- mixed: 同时使用 Web 和 X 搜索（推荐）',
+          'Search type:\n' +
+          '- web: Web search only\n' +
+          '- x: X (Twitter) search only\n' +
+          '- mixed: Both Web and X search (recommended)',
         default: 'mixed',
       },
       model: {
         type: 'string',
         enum: [...SUPPORTED_MODELS],
         description:
-          '使用的 Grok 模型：\n' +
-          '- grok-4.20-beta: 快速、便宜、2M 上下文（默认）\n' +
-          '- grok-4-latest: 最高质量，适合复杂任务',
+          'Grok model to use:\n' +
+          '- grok-4.20-beta: Fast, affordable, 2M context (default)\n' +
+          '- grok-4-latest: Highest quality, for complex tasks',
         default: 'grok-4.20-beta',
       },
       output_format: {
         type: 'string',
         enum: ['text', 'json'],
         description:
-          '输出格式：\n' +
-          '- text: Markdown 格式（默认）\n' +
-          '- json: 结构化 JSON 格式',
+          'Output format:\n' +
+          '- text: Markdown format (default)\n' +
+          '- json: Structured JSON format',
         default: 'text',
       },
       web_search_config: {
         type: 'object',
-        description: 'Web 搜索配置（当 search_type 为 web 或 mixed 时）',
+        description: 'Web search config (when search_type is web or mixed)',
         properties: {
           enable_image_understanding: {
             type: 'boolean',
-            description: '启用图片理解功能，允许 Grok 分析搜索结果中的图片',
+            description: 'Enable image understanding, allows Grok to analyze images in search results',
           },
           allowed_domains: {
             type: 'array',
             items: { type: 'string' },
-            description: '仅搜索指定域名（最多 5 个），例如：["wikipedia.org", "github.com"]',
+            description: 'Only search specified domains (max 5), e.g.: ["wikipedia.org", "github.com"]',
             maxItems: 5,
           },
           excluded_domains: {
             type: 'array',
             items: { type: 'string' },
-            description: '排除指定域名（最多 5 个），例如：["example.com"]',
+            description: 'Exclude specified domains (max 5), e.g.: ["example.com"]',
             maxItems: 5,
           },
         },
       },
       x_search_config: {
         type: 'object',
-        description: 'X 搜索配置（当 search_type 为 x 或 mixed 时）',
+        description: 'X search config (when search_type is x or mixed)',
         properties: {
           from_date: {
             type: 'string',
             description:
-              '开始日期，ISO8601 格式，例如：2024-01-01T00:00:00Z\n' +
-              '用于限制搜索时间范围的起始时间',
+              'Start date, ISO8601 format, e.g.: 2024-01-01T00:00:00Z\n' +
+              'Used to limit the search time range start',
           },
           to_date: {
             type: 'string',
             description:
-              '结束日期，ISO8601 格式，例如：2024-12-31T23:59:59Z\n' +
-              '用于限制搜索时间范围的结束时间',
+              'End date, ISO8601 format, e.g.: 2024-12-31T23:59:59Z\n' +
+              'Used to limit the search time range end',
           },
           enable_image_understanding: {
             type: 'boolean',
-            description: '启用图片理解功能，允许 Grok 分析推文中的图片',
+            description: 'Enable image understanding, allows Grok to analyze images in tweets',
           },
           enable_video_understanding: {
             type: 'boolean',
-            description: '启用视频理解功能，允许 Grok 分析推文中的视频内容',
+            description: 'Enable video understanding, allows Grok to analyze video content in tweets',
           },
           allowed_x_handles: {
             type: 'array',
             items: { type: 'string' },
             description:
-              '仅搜索指定 X 账号的推文（最多 10 个），例如：["elonmusk", "OpenAI"]\n' +
-              '注意：不需要 @ 前缀',
+              'Only search tweets from specified X accounts (max 10), e.g.: ["elonmusk", "OpenAI"]\n' +
+              'Note: No @ prefix needed',
             maxItems: 10,
           },
           excluded_x_handles: {
             type: 'array',
             items: { type: 'string' },
             description:
-              '排除指定 X 账号的推文（最多 10 个），例如：["spam_account"]\n' +
-              '注意：不需要 @ 前缀',
+              'Exclude tweets from specified X accounts (max 10), e.g.: ["spam_account"]\n' +
+              'Note: No @ prefix needed',
             maxItems: 10,
           },
         },
@@ -122,42 +122,42 @@ export const grokAgentSearchTool = {
 };
 
 /**
- * grok_brainstorm 工具定义
+ * grok_brainstorm tool definition
  *
- * 使用 Grok AI 进行创意头脑风暴
+ * Creative brainstorming using Grok AI
  */
 export const grokBrainstormTool = {
   name: 'grok_brainstorm',
   description:
-    '使用 Grok AI 进行创意头脑风暴。Grok 会基于给定主题生成创新想法、' +
-    '多角度分析和创意建议。适合产品设计、内容创作、问题解决、战略规划等场景。' +
-    'Grok 会从不同视角思考问题，提供富有创意和实用性的建议。' +
-    '支持读取项目文件作为上下文，生成贴合项目的创意。',
+    'Creative brainstorming powered by Grok AI. Generates innovative ideas, ' +
+    'multi-perspective analysis, and creative suggestions based on a given topic. ' +
+    'Ideal for product design, content creation, problem solving, and strategic planning. ' +
+    'Supports reading project files as context to generate project-relevant ideas.',
   inputSchema: {
     type: 'object',
     properties: {
       topic: {
         type: 'string',
         description:
-          '头脑风暴的主题，可以是问题、想法、产品概念等\n' +
-          '例如："如何提高用户留存率"、"新产品功能创意"、"营销活动策划"',
+          'Brainstorm topic — can be a question, idea, product concept, etc.\n' +
+          'e.g.: "How to improve user retention", "New product feature ideas", "Marketing campaign planning"',
       },
       context: {
         type: 'string',
         description:
-          '额外的上下文信息（可选），帮助 Grok 更好地理解背景\n' +
-          '例如：目标用户、行业背景、现有限制、预算范围等',
+          'Additional context information (optional) to help Grok better understand the background\n' +
+          'e.g.: target audience, industry background, existing constraints, budget range, etc.',
       },
       context_files: {
         type: 'array',
         items: { type: 'string' },
         description:
-          '项目文件路径（可选），读取文件内容作为上下文\n' +
-          '例如：["./README.md", "./docs/architecture.md"]',
+          'Project file paths (optional), reads file content as context\n' +
+          'e.g.: ["./README.md", "./docs/architecture.md"]',
       },
       count: {
         type: 'number',
-        description: '生成创意数量，1-10（默认 5）',
+        description: 'Number of ideas to generate, 1-10 (default 5)',
         default: 5,
         minimum: 1,
         maximum: 10,
@@ -166,29 +166,29 @@ export const grokBrainstormTool = {
         type: 'string',
         enum: ['innovative', 'practical', 'radical', 'balanced'],
         description:
-          '头脑风暴风格：\n' +
-          '- innovative: 创新型，追求新颖独特\n' +
-          '- practical: 务实型，注重可行性\n' +
-          '- radical: 激进型，突破常规思维\n' +
-          '- balanced: 平衡型（默认）',
+          'Brainstorm style:\n' +
+          '- innovative: Pursue novel and unique ideas\n' +
+          '- practical: Focus on feasibility\n' +
+          '- radical: Break conventional thinking\n' +
+          '- balanced: Balance of all (default)',
         default: 'balanced',
       },
       model: {
         type: 'string',
         enum: [...SUPPORTED_MODELS],
         description:
-          '使用的 Grok 模型：\n' +
-          '- grok-4.20-beta: 快速、便宜、2M 上下文（默认）\n' +
-          '- grok-4-latest: 最高质量，适合复杂任务',
+          'Grok model to use:\n' +
+          '- grok-4.20-beta: Fast, affordable, 2M context (default)\n' +
+          '- grok-4-latest: Highest quality, for complex tasks',
         default: 'grok-4.20-beta',
       },
       output_format: {
         type: 'string',
         enum: ['text', 'json'],
         description:
-          '输出格式：\n' +
-          '- text: Markdown 格式（默认）\n' +
-          '- json: 结构化 JSON（包含 ideas 数组，每个 idea 有 title/description/pros/cons/feasibility）',
+          'Output format:\n' +
+          '- text: Markdown format (default)\n' +
+          '- json: Structured JSON (ideas array with title/description/pros/cons/feasibility)',
         default: 'text',
       },
     },
@@ -197,7 +197,7 @@ export const grokBrainstormTool = {
 };
 
 /**
- * 所有工具定义的数组
+ * Array of all tool definitions
  */
 export const TOOL_DEFINITIONS = [
   grokAgentSearchTool,

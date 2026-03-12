@@ -1,8 +1,8 @@
 /**
- * Grok API 客户端
+ * Grok API Client
  *
- * 使用原生 fetch 调用 xAI Responses API
- * 原生 fetch (undici) 自动读取 HTTPS_PROXY 环境变量，无需额外代理配置
+ * Uses native fetch to call xAI Responses API
+ * Native fetch (undici) automatically reads HTTPS_PROXY env var, no extra proxy config needed
  */
 
 import type {
@@ -14,14 +14,14 @@ import type {
 import { xaiConfig, debugMode } from '../config/index.js';
 
 // ============================================================================
-// 核心 API 方法
+// Core API Methods
 // ============================================================================
 
 /**
- * 调用 xAI Responses API
+ * Call xAI Responses API
  *
- * @param request - API 请求参数
- * @returns API 响应
+ * @param request - API request parameters
+ * @returns API response
  */
 export async function createResponse(
   request: Omit<XAIResponsesRequest, 'stream'>
@@ -43,10 +43,10 @@ export async function createResponse(
   }
 
   if (debugMode) {
-    console.error('[Grok Client] 发送请求:', JSON.stringify(body, null, 2));
+    console.error('[Grok Client] Sending request:', JSON.stringify(body, null, 2));
   }
 
-  // 重试逻辑：最多重试 3 次
+  // Retry logic: up to 3 attempts
   let lastError: Error | null = null;
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
@@ -67,28 +67,28 @@ export async function createResponse(
 
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error(`API 请求失败 (${res.status}): ${errorText}`);
+        throw new Error(`API request failed (${res.status}): ${errorText}`);
       }
 
       const response = await res.json() as XAIResponsesResponse;
 
       if (debugMode) {
-        console.error('[Grok Client] 收到响应:', JSON.stringify(response, null, 2));
+        console.error('[Grok Client] Received response:', JSON.stringify(response, null, 2));
       }
 
       return response;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
 
-      // 如果是超时或网络错误，等待后重试
+      // If timeout or network error, wait and retry
       if (attempt < 2 && (
         lastError.name === 'AbortError' ||
         lastError.message.includes('fetch failed') ||
         lastError.message.includes('ECONNRESET')
       )) {
-        const delay = Math.pow(2, attempt) * 1000; // 指数退避：1s, 2s
+        const delay = Math.pow(2, attempt) * 1000; // Exponential backoff: 1s, 2s
         if (debugMode) {
-          console.error(`[Grok Client] 第 ${attempt + 1} 次重试，等待 ${delay}ms...`);
+          console.error(`[Grok Client] Retry attempt ${attempt + 1}, waiting ${delay}ms...`);
         }
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
@@ -98,42 +98,42 @@ export async function createResponse(
     }
   }
 
-  console.error('[Grok Client] API 调用失败:', lastError);
+  console.error('[Grok Client] API call failed:', lastError);
   throw lastError;
 }
 
 // ============================================================================
-// 辅助方法
+// Helper Methods
 // ============================================================================
 
 /**
- * 从响应中提取文本内容
+ * Extract text content from response
  *
- * @param response - API 响应
- * @returns 文本内容
+ * @param response - API response
+ * @returns Text content
  */
 export function extractContent(response: XAIResponsesResponse): string {
-  // output 数组可能包含 web_search_call、x_search_call 等，需要找到 message 类型
+  // Output array may contain web_search_call, x_search_call, etc. — find the message type
   const messageOutput = response.output?.find(item => item.type === 'message');
   if (!messageOutput) {
-    throw new Error('响应结构无效：缺少 message 类型的输出');
+    throw new Error('Invalid response structure: missing message type output');
   }
 
   const content = messageOutput.content?.[0];
   if (!content || content.type !== 'output_text') {
-    throw new Error('响应结构无效：缺少 output_text 类型的内容');
+    throw new Error('Invalid response structure: missing output_text type content');
   }
 
   return content.text;
 }
 
 /**
- * 从文本中提取引用 URL
+ * Extract citation URLs from text
  *
- * xAI 的引用格式：[[1]](https://example.com)
+ * xAI citation format: [[1]](https://example.com)
  *
- * @param text - 包含引用的文本
- * @returns 引用 URL 数组（去重）
+ * @param text - Text containing citations
+ * @returns Deduplicated citation URL array
  */
 export function extractCitations(text: string): string[] {
   const citationRegex = /\[\[(\d+)\]\]\((https?:\/\/[^\)]+)\)/g;
@@ -141,18 +141,18 @@ export function extractCitations(text: string): string[] {
   let match;
 
   while ((match = citationRegex.exec(text)) !== null) {
-    citations.push(match[2]); // 提取 URL
+    citations.push(match[2]); // Extract URL
   }
 
-  // 去重并返回
+  // Deduplicate and return
   return [...new Set(citations)];
 }
 
 /**
- * 提取 Token 使用统计
+ * Extract token usage statistics
  *
- * @param response - API 响应
- * @returns Token 使用统计对象
+ * @param response - API response
+ * @returns Token usage statistics object
  */
 export function extractUsage(response: XAIResponsesResponse) {
   const usage = response.usage;
@@ -169,14 +169,14 @@ export function extractUsage(response: XAIResponsesResponse) {
 }
 
 /**
- * 计算 API 调用成本
+ * Calculate API call cost
  *
- * @param response - API 响应
- * @returns 成本（美元）
+ * @param response - API response
+ * @returns Cost in USD
  */
 export function calculateCost(response: XAIResponsesResponse): number {
   const costInTicks = response.usage.cost_in_usd_ticks;
   // 1 tick = 0.0000000001 USD
-  // 即 10,000,000,000 ticks = 1 USD
+  // i.e. 10,000,000,000 ticks = 1 USD
   return costInTicks / 10_000_000_000;
 }
