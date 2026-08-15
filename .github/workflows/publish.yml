@@ -16,14 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      # 必须用 v6：v4 会往 .npmrc 写空的 _authToken，导致 npm 跳过 OIDC 交换 → 403
+      - uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'                        # Node 24 自带兼容 OIDC 的 npm(>=11.5.1)
           registry-url: 'https://registry.npmjs.org'
-
-      # 升级 npm 到支持 Trusted Publishing 的版本（>=11.5.1）
-      - name: 升级 npm
-        run: npm install -g npm@latest
+          package-manager-cache: false              # 发布流程关掉包缓存，避免干扰
 
       - name: 安装依赖
         run: npm ci
