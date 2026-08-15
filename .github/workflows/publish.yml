@@ -1,0 +1,37 @@
+name: Publish to npm
+
+# 打 v* 标签时自动发布到 npm（使用 OIDC Trusted Publishing，无需 token）
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write   # OIDC 铸造短期令牌所必需
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      # 升级 npm 到支持 Trusted Publishing 的版本（>=11.5.1）
+      - name: 升级 npm
+        run: npm install -g npm@latest
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建
+        run: npm run build
+
+      # Trusted Publishing：检测到 id-token 权限 + npm 侧已配置可信发布者时，
+      # 自动用 OIDC 认证并生成 provenance，无需 NODE_AUTH_TOKEN
+      - name: 发布
+        run: npm publish --access public
