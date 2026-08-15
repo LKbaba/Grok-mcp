@@ -6,13 +6,13 @@ on:
     tags:
       - 'v*'
 
-permissions:
-  id-token: write   # OIDC 铸造短期令牌所必需
-  contents: read
-
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # 权限收到 job 级，遵循最小权限原则（仅发布 job 拥有 OIDC 写入）
+    permissions:
+      id-token: write   # OIDC 铸造短期令牌所必需
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -32,6 +32,7 @@ jobs:
         run: npm run build
 
       # Trusted Publishing：检测到 id-token 权限 + npm 侧已配置可信发布者时，
-      # 自动用 OIDC 认证并生成 provenance，无需 NODE_AUTH_TOKEN
+      # 自动用 OIDC 认证，无需 NODE_AUTH_TOKEN
+      # --provenance 显式生成供应链溯源标记（开源包的加分项）
       - name: 发布
-        run: npm publish --access public
+        run: npm publish --provenance --access public
