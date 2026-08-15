@@ -29,15 +29,13 @@ jobs:
       - name: 构建
         run: npm run build
 
-      # 诊断：确认 npm 版本、.npmrc 是否残留 _authToken、OIDC 环境是否就绪
-      - name: 诊断环境
+      # 关键：清掉 setup-node 写入的占位 _authToken，只保留 registry。
+      # 否则 npm 在 PUT 时会用这个假 token 覆盖 OIDC 令牌，导致 403。
+      - name: 清理 .npmrc 强制走 OIDC
         run: |
-          echo "node: $(node -v)  npm: $(npm -v)"
-          echo "--- 用户级 .npmrc (${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}) ---"
-          cat "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" 2>/dev/null || echo "(无)"
-          echo "--- 项目级 .npmrc ---"
-          cat .npmrc 2>/dev/null || echo "(无)"
-          echo "OIDC 请求地址是否存在: ${ACTIONS_ID_TOKEN_REQUEST_URL:+yes}"
+          printf 'registry=https://registry.npmjs.org/\n' > "$NPM_CONFIG_USERCONFIG"
+          echo "--- 清理后 .npmrc ---"
+          cat "$NPM_CONFIG_USERCONFIG"
 
       # Trusted Publishing：检测到 id-token 权限 + npm 侧已配置可信发布者时自动走 OIDC
       - name: 发布
