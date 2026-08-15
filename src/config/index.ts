@@ -25,6 +25,9 @@ const envSchema = z.object({
 
   // Debug mode (optional)
   DEBUG: z.string().optional(),
+
+  // 请求超时（毫秒），可选；缺省 500000（500 秒）
+  GROK_MCP_TIMEOUT: z.string().optional(),
 });
 
 // ============================================================================
@@ -84,8 +87,8 @@ export const xaiConfig = {
   baseURL: 'https://api.x.ai/v1',
   /** Default model (v4: multi-agent for best search accuracy and brainstorm quality) */
   defaultModel: 'grok-4.20-multi-agent-beta-0309' as SupportedModel,
-  /** Request timeout (milliseconds) */
-  timeout: 120000, // 120 seconds
+  /** 请求超时（毫秒），可用环境变量 GROK_MCP_TIMEOUT 覆盖，默认 500 秒 */
+  timeout: env.GROK_MCP_TIMEOUT ? Number(env.GROK_MCP_TIMEOUT) : 500000, // 默认 500 秒
 } as const;
 
 /**
@@ -95,7 +98,7 @@ export const mcpConfig = {
   /** Service name */
   name: 'grok-mcp',
   /** Service version */
-  version: '2.0.2',
+  version: '2.0.5',
 } as const;
 
 /**

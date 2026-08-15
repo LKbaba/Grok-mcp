@@ -85,9 +85,9 @@ export async function createResponse(
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
 
-      // If timeout or network error, wait and retry
+      // 仅对瞬时网络错误重试；超时(AbortError)不重试
+      // 原因：multi-agent 慢请求重试仍会慢，重试只会 N 倍浪费时间并更晚失败
       if (attempt < 2 && (
-        lastError.name === 'AbortError' ||
         lastError.message.includes('fetch failed') ||
         lastError.message.includes('ECONNRESET')
       )) {
