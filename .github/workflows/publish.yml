@@ -37,9 +37,10 @@ jobs:
           echo "--- 清理后 .npmrc ---"
           cat "$NPM_CONFIG_USERCONFIG"
 
-      # Trusted Publishing：检测到 id-token 权限 + npm 侧已配置可信发布者时自动走 OIDC
-      - name: 发布
-        run: npm publish --provenance --access public --loglevel verbose
+      # 用 staged publishing：CI 只暂存（OIDC，无需 2FA），
+      # 之后由维护者在网页/CLI 用 passkey 批准，绕过直接 PUT 被策略拒的问题
+      - name: 暂存发布
+        run: npm stage publish --provenance --access public --loglevel verbose
 
       # 失败时打印 npm 完整调试日志，拿到真实的 403 原因
       - name: 失败时打印调试日志
